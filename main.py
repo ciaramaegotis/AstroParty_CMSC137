@@ -1,13 +1,23 @@
 #! /usr/bin/python
 
 from proto.tcp_packet_pb2 import TcpPacket
+# from threading import Thread
 import socket
 import sys
 import select
 import pickle
+from threading import Thread
 
 syntax = "proto2"
 
+def evaluateData(data):
+	packet.ParseFromString(data)
+	if (packet.type == packet.CONNECT):
+		chat_packet.ParseFromString(data)
+		print("{} joined chat.".format(chat_packet.player.name))
+	elif (packet.type == packet.CHAT):
+		chat_send.ParseFromString(data)
+		print("{}: {}".format(chat_send.player.name, chat_send.message))
 
 def createLobby(sock):
     lobbyDetails = TcpPacket()
@@ -54,21 +64,25 @@ packet.type = packet.CONNECT
 chat_packet.player.name = username
 chat_packet.lobby_id = lobbyID
 
-sock.send(chat_packet.SerializeToString())
+try:
+	sock.send(chat_packet.SerializeToString())
+except:
+	print("Error in creating a lobby~")
 
 chat_send = packet.ChatPacket()
 chat_send.type = packet.CHAT
 chat_send.player.name = username
 chat_send.lobby_id = lobbyID
 
+receiving_thread = Thread(target=evaluateData, args=[sock.recv(2048)])
+receiving_thread.start()
+
 while (True):
-	message = input("Message: ")
+	message = input("Chat >> ")
 	try:
 		chat_send.message = message
 		sock.send(chat_send.SerializeToString())
-		# receive = sock.recv(2048)
-		# finalMessage = chat_send.ParseFromString(receive)
-		# print("{}".format(finalMessage))
+		evaluateData(sock.recv(2048))
 	except OSError:
 		print("Error")
 		break
