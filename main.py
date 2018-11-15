@@ -26,7 +26,7 @@ def evaluateData(data):
 		print("\n{}: {}".format(chat_send.player.name, chat_send.message))
 	elif (packet.type == packet.ERR_LDNE):
 		print("This prints if the Lobby doesn't exist")
-	elif (packet.type == packet.LFULL):
+	elif (packet.type == packet.ERR_LFULL):
 		print("This prints if the Lobby is already full")
 	elif (packet.type == packet.ERR):
 		print("An error occured.")
@@ -47,8 +47,29 @@ def createNewLobby():
 	else:
 		lobbyID = input("\nEnter lobby ID: ")
 	username = input("\nEnter username: ")
+	chat_packet.player.name = username
+	chat_packet.lobby_id = lobbyID
+	try:
+		connect = sock.send(chat_packet.SerializeToString())
+	except:
+		print("\nError in creating/entering a lobby~")
 	return lobbyID, username
 
+def startChat():
+	chat_send.player.name = username
+	chat_send.lobby_id = lobbyID
+
+	receiving_thread = Thread(target=receiveData, args=[evaluateData])
+	receiving_thread.start()
+
+	while (True):
+		try:
+			message = input("\nChat >> ")
+			chat_send.message = message
+			sock.send(chat_send.SerializeToString())
+		except OSError:
+			print("\nError")
+			break
 
 # Create a TCP/IP socket and connect the socket to the port where the server is listening
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -66,30 +87,10 @@ connection.type = packet.CONNECT
 chat_packet = packet.ConnectPacket()
 chat_packet.type = packet.CONNECT
 
-lobbyID, username = createNewLobby()
-packet.type = packet.CONNECT
-chat_packet.player.name = username
-chat_packet.lobby_id = lobbyID
-
-try:
-	connect = sock.send(chat_packet.SerializeToString())
-except:
-	print("\nError in creating/entering a lobby~")
-
-
+#Send Packet
 chat_send = packet.ChatPacket()
 chat_send.type = packet.CHAT
-chat_send.player.name = username
-chat_send.lobby_id = lobbyID
 
-receiving_thread = Thread(target=receiveData, args=[evaluateData])
-receiving_thread.start()
+lobbyID, username = createNewLobby()
 
-while (True):
-	try:
-		message = input("\nChat >> ")
-		chat_send.message = message
-		sock.send(chat_send.SerializeToString())
-	except OSError:
-		print("\nError")
-		break
+startChat()
