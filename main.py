@@ -26,6 +26,7 @@ def evaluateData(data):
 		print("\n{}: {}".format(chat_send.player.name, chat_send.message))
 	elif (packet.type == packet.ERR_LDNE):
 		print("This prints if the Lobby doesn't exist")
+		createNewLobby()
 	elif (packet.type == packet.ERR_LFULL):
 		print("This prints if the Lobby is already full")
 	elif (packet.type == packet.ERR):
