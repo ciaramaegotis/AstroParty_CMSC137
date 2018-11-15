@@ -38,7 +38,7 @@ def createNewLobby():
 	    packet.type = packet.CREATE_LOBBY
 	    lobbyDetails = packet.CreateLobbyPacket()
 	    lobbyDetails.type = packet.CREATE_LOBBY
-	    lobbyDetails.max_players = 4
+	    lobbyDetails.max_players = int(input("Enter the maximum number of players: "))
 
 	    room = sock.send(lobbyDetails.SerializeToString())
 	    room = sock.recv(2048)
