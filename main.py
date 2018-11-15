@@ -24,47 +24,49 @@ def evaluateData(data):
 	elif (packet.type == packet.CHAT):
 		chat_send.ParseFromString(data)
 		print("\n{}: {}".format(chat_send.player.name, chat_send.message))
+	elif (packet.type == packet.ERR_LDNE):
+		print("This prints if the Lobby doesn't exist")
+	elif (packet.type == packet.LFULL):
+		print("This prints if the Lobby is already full")
+	elif (packet.type == packet.ERR):
+		print("An error occured.")
 
-def createLobby(sock):
-    lobbyDetails = TcpPacket()
-    lobbyDetails.type = 1
-    lobbyDetails.max_players = 3
-    sock.send(bytes())
+def createNewLobby():
+	choice = input("Create New Lobby? Y/N: ")
+	if choice == 'Y':
+	    packet.type = packet.CREATE_LOBBY
+	    lobbyDetails = packet.CreateLobbyPacket()
+	    lobbyDetails.type = packet.CREATE_LOBBY
+	    lobbyDetails.max_players = 4
 
-# Create a TCP/IP socket
+	    room = sock.send(lobbyDetails.SerializeToString())
+	    room = sock.recv(2048)
+	    lobbyDetails.ParseFromString(room)
+	    lobbyID = lobbyDetails.lobby_id
+	    print("\nlobbyID: {}".format(lobbyID))
+	else:
+		lobbyID = input("\nEnter lobby ID: ")
+	username = input("\nEnter username: ")
+	return lobbyID, username
+
+
+# Create a TCP/IP socket and connect the socket to the port where the server is listening
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Connect the socket to the port where the server is listening
 server_address = ("202.92.144.45", 80)
-#print("connecting to %s port %s" % server_address, file=sys.stderr)
 sock.connect(server_address)
 
+#declare different types of packets
 packet = TcpPacket()
+
+#Connect Packet
 connection = packet.ConnectPacket()
 connection.type = packet.CONNECT
 
+#Chat Packet
 chat_packet = packet.ConnectPacket()
 chat_packet.type = packet.CONNECT
 
-
-choice = input("Create New Lobby? Y/N: ")
-if choice == 'Y':
-    packet.type = packet.CREATE_LOBBY
-    lobbyDetails = packet.CreateLobbyPacket()
-    lobbyDetails.type = packet.CREATE_LOBBY
-    lobbyDetails.max_players = 4
-
-    room = sock.send(lobbyDetails.SerializeToString())
-    room = sock.recv(2048)
-    lobbyDetails.ParseFromString(room)
-    lobbyID = lobbyDetails.lobby_id
-    print("\nlobbyID: {}".format(lobbyID))
-else:
-	lobbyID = input("\nEnter lobby ID: ")
-
-
-username = input("\nEnter username: ")
-
-#connects the new user
+lobbyID, username = createNewLobby()
 packet.type = packet.CONNECT
 chat_packet.player.name = username
 chat_packet.lobby_id = lobbyID
@@ -72,7 +74,7 @@ chat_packet.lobby_id = lobbyID
 try:
 	connect = sock.send(chat_packet.SerializeToString())
 except:
-	print("\nError in creating a lobby~")
+	print("\nError in creating/entering a lobby~")
 
 
 chat_send = packet.ChatPacket()
