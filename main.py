@@ -10,21 +10,26 @@ from threading import Thread
 
 syntax = "proto2"
 
+
+def receiveData(callback):
+	while True:
+		data = sock.recv(2048)
+		callback(data)
+
 def evaluateData(data):
 	packet.ParseFromString(data)
 	if (packet.type == packet.CONNECT):
 		chat_packet.ParseFromString(data)
-		print("{} joined chat.".format(chat_packet.player.name))
+		print("\n{} joined chat.".format(chat_packet.player.name))
 	elif (packet.type == packet.CHAT):
 		chat_send.ParseFromString(data)
-		print("{}: {}".format(chat_send.player.name, chat_send.message))
+		print("\n{}: {}".format(chat_send.player.name, chat_send.message))
 
 def createLobby(sock):
     lobbyDetails = TcpPacket()
     lobbyDetails.type = 1
     lobbyDetails.max_players = 3
     sock.send(bytes())
-
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,12 +57,12 @@ if choice == 'Y':
     room = sock.recv(2048)
     lobbyDetails.ParseFromString(room)
     lobbyID = lobbyDetails.lobby_id
-    print("lobbyID: {}".format(lobbyID))
+    print("\nlobbyID: {}".format(lobbyID))
 else:
-	lobbyID = input("Enter lobby ID: ")
+	lobbyID = input("\nEnter lobby ID: ")
 
 
-username = input("Enter username: ")
+username = input("\nEnter username: ")
 
 #connects the new user
 packet.type = packet.CONNECT
@@ -65,24 +70,24 @@ chat_packet.player.name = username
 chat_packet.lobby_id = lobbyID
 
 try:
-	sock.send(chat_packet.SerializeToString())
+	connect = sock.send(chat_packet.SerializeToString())
 except:
-	print("Error in creating a lobby~")
+	print("\nError in creating a lobby~")
+
 
 chat_send = packet.ChatPacket()
 chat_send.type = packet.CHAT
 chat_send.player.name = username
 chat_send.lobby_id = lobbyID
 
-receiving_thread = Thread(target=evaluateData, args=[sock.recv(2048)])
+receiving_thread = Thread(target=receiveData, args=[evaluateData])
 receiving_thread.start()
 
 while (True):
-	message = input("Chat >> ")
 	try:
+		message = input("\nChat >> ")
 		chat_send.message = message
 		sock.send(chat_send.SerializeToString())
-		evaluateData(sock.recv(2048))
 	except OSError:
-		print("Error")
+		print("\nError")
 		break
