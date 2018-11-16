@@ -31,7 +31,7 @@ def evaluateData(data):
     elif (packet.type == packet.DISCONNECT):
         print("\n{} disconnected from chat.".format(chat_packet.player.name))
         if (chat_packet.player.name == username):
-        	quit()
+            quit()
     elif (packet.type == packet.ERR_LFULL):
         print("This prints if the Lobby is already full")
     elif (packet.type == packet.ERR):
@@ -65,6 +65,19 @@ def createNewLobby():
         print("\nError in creating/entering a lobby~")
     return lobbyID, username
 
+
+def listPlayers():
+    recv = sock.send(list_players.SerializeToString())
+    recv = sock.recv(2048)
+    list_players.ParseFromString(recv)
+    return list_players.player_list
+
+
+def checkFull():
+    numPlayers = len(listplayers())
+    # if(numPlayers >= lobbyDetails.max_players)
+
+
 def startChat():
     chat_send.player.name = username
     chat_send.lobby_id = lobbyID
@@ -75,10 +88,15 @@ def startChat():
         try:
             message = input("")
             if(message == "DC"):
-            	chat_disconnect.player.name = username
-            	sock.send(chat_disconnect.SerializeToString())
-            	isBreak = True
-            	quit()
+                chat_disconnect.player.name = username
+                sock.send(chat_disconnect.SerializeToString())
+                isBreak = True
+                quit()
+            elif(message == "listp"):
+                playersList = listPlayers()
+                for player in playersList:
+                    print(player)
+                print(">> ", end='')
             else:
                 chat_send.message = message
                 sock.send(chat_send.SerializeToString())
@@ -111,7 +129,11 @@ chat_send.type = packet.CHAT
 chat_disconnect = packet.DisconnectPacket()
 chat_disconnect.type = packet.DISCONNECT
 
+# List Players Packet
+list_players = packet.PlayerListPacket()
+list_players.type = packet.PLAYER_LIST
+
 isBreak = False
 if (isBreak == False):
-	lobbyID, username = createNewLobby()
-	startChat()
+    lobbyID, username = createNewLobby()
+    startChat()
