@@ -130,6 +130,4 @@ listp_packet.type = packet.PLAYER_LIST
 isBreak = False
 if (isBreak == False):
     lobbyID, username = createNewLobby()
-    # if(checkFull()):
-    # print("Lobbyfull")
     startChat()
