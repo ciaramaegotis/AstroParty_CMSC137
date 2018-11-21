@@ -4,8 +4,6 @@ from proto.tcp_packet_pb2 import TcpPacket
 # from threading import Thread
 import socket
 from sys import stdout
-import select
-import pickle
 from threading import Thread
 
 syntax = "proto2"
@@ -34,6 +32,7 @@ def evaluateData(data):
             quit()
     elif (packet.type == packet.ERR_LFULL):
         print("This prints if the Lobby is already full")
+        createNewLobby()
     elif (packet.type == packet.ERR):
         print("An error occured.")
     print(">> ", end='')
@@ -67,15 +66,10 @@ def createNewLobby():
 
 
 def listPlayers():
-    recv = sock.send(list_players.SerializeToString())
-    recv = sock.recv(2048)
-    list_players.ParseFromString(recv)
-    return list_players.player_list
-
-
-def checkFull():
-    numPlayers = len(listplayers())
-    # if(numPlayers >= lobbyDetails.max_players)
+    data = sock.send(listp_packet.SerializeToString())
+    data = sock.recv(1024)
+    listp_packet.ParseFromString(data)
+    return listp_packet.player_list
 
 
 def startChat():
@@ -87,12 +81,12 @@ def startChat():
     while (True):
         try:
             message = input("")
-            if(message == "DC"):
+            if(message == "dc()"):
                 chat_disconnect.player.name = username
                 sock.send(chat_disconnect.SerializeToString())
                 isBreak = True
                 quit()
-            elif(message == "listp"):
+            elif(message == "list()"):
                 playersList = listPlayers()
                 for player in playersList:
                     print(player)
@@ -130,10 +124,12 @@ chat_disconnect = packet.DisconnectPacket()
 chat_disconnect.type = packet.DISCONNECT
 
 # List Players Packet
-list_players = packet.PlayerListPacket()
-list_players.type = packet.PLAYER_LIST
+listp_packet = packet.PlayerListPacket()
+listp_packet.type = packet.PLAYER_LIST
 
 isBreak = False
 if (isBreak == False):
     lobbyID, username = createNewLobby()
+    # if(checkFull()):
+    # print("Lobbyfull")
     startChat()
