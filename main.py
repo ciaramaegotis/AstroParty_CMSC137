@@ -41,11 +41,13 @@ def evaluateData(data):
 
 def createNewLobby():
     bg = pg.image.load("background.jpeg")
-    start_panel = pg.image.load("obstacle.png")
+    start_panel = pg.image.load("CreateLobby.png")
+    join_panel = pg.image.load("joinlobby.png")
+    exit_panel = pg.image.load("exit.png")
     astro_party = pg.image.load("astro_party.png")
-    start_panel = pg.transform.scale(start_panel, (150, 50))
-    join_panel = start_panel
-    exit_panel = start_panel
+    start_panel = pg.transform.scale(start_panel, (250, 150))
+    join_panel = pg.transform.scale(join_panel, (250, 150))
+    exit_panel = pg.transform.scale(exit_panel, (250, 150))
     screen = pg.display.set_mode((850, 450))
     clock = pg.time.Clock()
     active = False
@@ -57,19 +59,89 @@ def createNewLobby():
                 done = True
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
-                    print("start button was pressed!")
+                    print("You selected Create Lobby!\n")
+                    screen.blit(bg, (0, 0))
+                    enterHosts = pg.image.load("EnterHosts.png")
+                    screen.blit(enterHosts, (-10, -10))
+                    pg.display.flip()
+                    clock.tick(30)
+
+                    font = pg.font.Font(None, 32)
+                    input_box = pg.Rect(320, 250, 140, 32)
+                    text = ""
+                    color = pg.Color("orange")
+                    done = False
+                    max_hosts = 0
+                    while not done:
+                        for event in pg.event.get():
+                            if event.type == pg.QUIT:
+                                done = True
+                            if event.type == pg.KEYDOWN:
+                                if event.key == pg.K_RETURN:
+                                    print(text + " is the chosen max players.")
+                                    max_hosts = int(text)
+                                    done = True
+                                    text = ''
+                                elif event.key == pg.K_BACKSPACE:
+                                    text = text[:-1]
+                                else:
+                                    text += event.unicode
+                        txt_surface = font.render(text, True, color)
+                        width = max(200, txt_surface.get_width()+10)
+                        input_box.w = width
+                        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+                        pg.draw.rect(screen, color, input_box, 2)
+                        pg.display.flip()
+                        clock.tick(30)
+
+                    pg.display.flip()
+                    clock.tick(30)
                     packet.type = packet.CREATE_LOBBY
                     lobbyDetails = packet.CreateLobbyPacket()
                     lobbyDetails.type = packet.CREATE_LOBBY
-                    max_hosts = int(input("Enter Max Number of Hosts: "))
                     lobbyDetails.max_players = max_hosts
 
                     room = sock.send(lobbyDetails.SerializeToString())
                     room = sock.recv(2048)
                     lobbyDetails.ParseFromString(room)
                     lobbyID = lobbyDetails.lobby_id
+
+                    screen.blit(bg, (0, 0))
+                    myfont = pg.font.SysFont("monospace", 50)
+                    label = myfont.render("LOBBY ID: " + str(lobbyID), 1, (255,255,0))
+                    screen.blit(label, (100, 100))
+                    pg.display.flip()
+                    clock.tick(30)
+
+                    font = pg.font.Font(None, 32)
+                    input_box = pg.Rect(320, 250, 140, 32)
+                    text = ""
+                    color = pg.Color("orange")
+                    done = False
+                    username = ""
+                    while not done:
+                        for event in pg.event.get():
+                            if event.type == pg.QUIT:
+                                done = True
+                            if event.type == pg.KEYDOWN:
+                                if event.key == pg.K_RETURN:
+                                    print(text + " is the host's username")
+                                    username = text
+                                    done = True
+                                    text = ''
+                                elif event.key == pg.K_BACKSPACE:
+                                    text = text[:-1]
+                                else:
+                                    text += event.unicode
+                        txt_surface = font.render(text, True, color)
+                        width = max(200, txt_surface.get_width()+10)
+                        input_box.w = width
+                        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+                        pg.draw.rect(screen, color, input_box, 2)
+                        pg.display.flip()
+                        clock.tick(30)
+
                     print("\nlobbyID: {}".format(lobbyID))
-                    username = input("\nEnter username: ")
                     chat_packet.player.name = username
                     chat_packet.lobby_id = lobbyID
                     try:
@@ -106,12 +178,20 @@ def createNewLobby():
         start_button = pg.draw.rect(screen,(0,0,0),(360,250,149,49));
         continue_button = pg.draw.rect(screen,(0,0,0),(280,330,149,49));
         quit_button = pg.draw.rect(screen,(0,0,0),(450,330,140,49));
-        screen.blit(start_panel, (360, 250))
-        screen.blit(join_panel, (280, 330))
-        screen.blit(exit_panel, (450, 330))
+        screen.blit(start_panel, (310, 200))
+        screen.blit(join_panel, (230, 280))
+        screen.blit(exit_panel, (398, 280))
         screen.blit(astro_party, (270, 100))
         pg.display.flip()
         clock.tick(30)
+def listPlayers():
+    data = sock.send(listp_packet.SerializeToString())
+    data = sock.recv(1024)
+    listp_packet.ParseFromString(data)
+    return listp_packet.player_list
+
+
+
 def listPlayers():
     data = sock.send(listp_packet.SerializeToString())
     data = sock.recv(1024)
