@@ -5,9 +5,9 @@ from proto.tcp_packet_pb2 import TcpPacket
 import socket
 from sys import stdout
 from threading import Thread
+import pygame as pg
 
 syntax = "proto2"
-
 
 def receiveData(callback):
     while True:
@@ -40,31 +40,78 @@ def evaluateData(data):
 
 
 def createNewLobby():
-    choice = input("[1]Create Lobby\n[2]Join Lobby\n[3]Exit\n>>")
-    if choice == "1":
-        packet.type = packet.CREATE_LOBBY
-        lobbyDetails = packet.CreateLobbyPacket()
-        lobbyDetails.type = packet.CREATE_LOBBY
-        max_hosts = int(input("Enter Max Number of Hosts: "))
-        lobbyDetails.max_players = max_hosts
+    bg = pg.image.load("background.jpeg")
+    start_panel = pg.image.load("obstacle.png")
+    astro_party = pg.image.load("astro_party.png")
+    start_panel = pg.transform.scale(start_panel, (150, 50))
+    join_panel = start_panel
+    exit_panel = start_panel
+    screen = pg.display.set_mode((850, 450))
+    clock = pg.time.Clock()
+    active = False
+    text = ''
+    done = False
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(event.pos):
+                    print("start button was pressed!")
+                    packet.type = packet.CREATE_LOBBY
+                    lobbyDetails = packet.CreateLobbyPacket()
+                    lobbyDetails.type = packet.CREATE_LOBBY
+                    max_hosts = int(input("Enter Max Number of Hosts: "))
+                    lobbyDetails.max_players = max_hosts
 
-        room = sock.send(lobbyDetails.SerializeToString())
-        room = sock.recv(2048)
-        lobbyDetails.ParseFromString(room)
-        lobbyID = lobbyDetails.lobby_id
-        print("\nlobbyID: {}".format(lobbyID))
-    elif choice == '2':
-        lobbyID = input("\nEnter lobby ID: ")
-    username = input("\nEnter username: ")
-    chat_packet.player.name = username
-    chat_packet.lobby_id = lobbyID
-    try:
-        connect = sock.send(chat_packet.SerializeToString())
-    except:
-        print("\nError in creating/entering a lobby~")
-    return lobbyID, username
+                    room = sock.send(lobbyDetails.SerializeToString())
+                    room = sock.recv(2048)
+                    lobbyDetails.ParseFromString(room)
+                    lobbyID = lobbyDetails.lobby_id
+                    print("\nlobbyID: {}".format(lobbyID))
+                    username = input("\nEnter username: ")
+                    chat_packet.player.name = username
+                    chat_packet.lobby_id = lobbyID
+                    try:
+                        connect = sock.send(chat_packet.SerializeToString())
+                    except:
+                        print("\nError in creating/entering a lobby~")
+                    return lobbyID, username
+                elif continue_button.collidepoint(event.pos):
+                    print("continue button was pressed!")
+                    lobbyID = input("\nEnter lobby ID: ")
+                    username = input("\nEnter username: ")
+                    chat_packet.player.name = username
+                    chat_packet.lobby_id = lobbyID
+                    try:
+                        connect = sock.send(chat_packet.SerializeToString())
+                    except:
+                        print("\nError in creating/entering a lobby~")
+                    return lobbyID, username
+                elif quit_button.collidepoint(event.pos):
+                    print("quit button was pressed!")
+                    quit()
+            if event.type == pg.KEYDOWN:
+                if active:
+                    if event.key == pg.K_RETURN:
+                        print(text)
+                        text = ''
+                    elif event.key == pg.K_BACKSPACE:
+                        text = text[:-1]
+                    else:
+                        text += event.unicode
 
-
+        screen.fill((10, 10, 10))
+        screen.blit(bg, (0, 0))
+        start_button = pg.draw.rect(screen,(0,0,0),(360,250,149,49));
+        continue_button = pg.draw.rect(screen,(0,0,0),(280,330,149,49));
+        quit_button = pg.draw.rect(screen,(0,0,0),(450,330,140,49));
+        screen.blit(start_panel, (360, 250))
+        screen.blit(join_panel, (280, 330))
+        screen.blit(exit_panel, (450, 330))
+        screen.blit(astro_party, (270, 100))
+        pg.display.flip()
+        clock.tick(30)
 def listPlayers():
     data = sock.send(listp_packet.SerializeToString())
     data = sock.recv(1024)
@@ -129,5 +176,7 @@ listp_packet.type = packet.PLAYER_LIST
 
 isBreak = False
 if (isBreak == False):
+    pg.init()
     lobbyID, username = createNewLobby()
     startChat()
+    pg.quit()
