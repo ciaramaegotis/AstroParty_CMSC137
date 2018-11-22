@@ -44,7 +44,6 @@ def main():
 			newResult = [text[i:i+20] for i in range(0, len(text), 20)]
 			start_col = 380
 			for j in newResult:
-				print("here")
 				screen.blit(font.render(j, True, color), (23, start_col))
 				start_col = start_col + 17
 		else:

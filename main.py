@@ -4,8 +4,6 @@ from proto.tcp_packet_pb2 import TcpPacket
 # from threading import Thread
 import socket
 from sys import stdout
-import select
-import pickle
 from threading import Thread
 
 syntax = "proto2"
@@ -31,9 +29,10 @@ def evaluateData(data):
     elif (packet.type == packet.DISCONNECT):
         print("\n{} disconnected from chat.".format(chat_packet.player.name))
         if (chat_packet.player.name == username):
-        	quit()
+            quit()
     elif (packet.type == packet.ERR_LFULL):
         print("This prints if the Lobby is already full")
+        createNewLobby()
     elif (packet.type == packet.ERR):
         print("An error occured.")
     print(">> ", end='')
@@ -65,6 +64,14 @@ def createNewLobby():
         print("\nError in creating/entering a lobby~")
     return lobbyID, username
 
+
+def listPlayers():
+    data = sock.send(listp_packet.SerializeToString())
+    data = sock.recv(1024)
+    listp_packet.ParseFromString(data)
+    return listp_packet.player_list
+
+
 def startChat():
     chat_send.player.name = username
     chat_send.lobby_id = lobbyID
@@ -74,11 +81,16 @@ def startChat():
     while (True):
         try:
             message = input("")
-            if(message == "DC"):
-            	chat_disconnect.player.name = username
-            	sock.send(chat_disconnect.SerializeToString())
-            	isBreak = True
-            	quit()
+            if(message == "dc()"):
+                chat_disconnect.player.name = username
+                sock.send(chat_disconnect.SerializeToString())
+                isBreak = True
+                quit()
+            elif(message == "list()"):
+                playersList = listPlayers()
+                for player in playersList:
+                    print(player)
+                print(">> ", end='')
             else:
                 chat_send.message = message
                 sock.send(chat_send.SerializeToString())
@@ -111,7 +123,11 @@ chat_send.type = packet.CHAT
 chat_disconnect = packet.DisconnectPacket()
 chat_disconnect.type = packet.DISCONNECT
 
+# List Players Packet
+listp_packet = packet.PlayerListPacket()
+listp_packet.type = packet.PLAYER_LIST
+
 isBreak = False
 if (isBreak == False):
-	lobbyID, username = createNewLobby()
-	startChat()
+    lobbyID, username = createNewLobby()
+    startChat()
