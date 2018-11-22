@@ -9,6 +9,10 @@ import pygame as pg
 
 syntax = "proto2"
 
+screen = pg.display.set_mode((850, 450))
+bg = pg.image.load("background.jpeg")
+clock = pg.time.Clock()
+
 def receiveData(callback):
     while True:
         data = sock.recv(2048)
@@ -40,7 +44,6 @@ def evaluateData(data):
 
 
 def createNewLobby():
-    bg = pg.image.load("background.jpeg")
     start_panel = pg.image.load("CreateLobby.png")
     join_panel = pg.image.load("joinlobby.png")
     exit_panel = pg.image.load("exit.png")
@@ -48,8 +51,6 @@ def createNewLobby():
     start_panel = pg.transform.scale(start_panel, (250, 150))
     join_panel = pg.transform.scale(join_panel, (250, 150))
     exit_panel = pg.transform.scale(exit_panel, (250, 150))
-    screen = pg.display.set_mode((850, 450))
-    clock = pg.time.Clock()
     active = False
     text = ''
     done = False
@@ -107,14 +108,21 @@ def createNewLobby():
                     lobbyID = lobbyDetails.lobby_id
 
                     screen.blit(bg, (0, 0))
+                    lobbyIDPic = pg.image.load("LobbyID.png")
+                    lobbyidval = pg.image.load("lobbyidval.png")
+                    screen.blit(lobbyIDPic, (10, -100))
+                    screen.blit(lobbyidval, (-10, -30))
                     myfont = pg.font.SysFont("monospace", 50)
-                    label = myfont.render("LOBBY ID: " + str(lobbyID), 1, (255,255,0))
-                    screen.blit(label, (100, 100))
+                    start_x = 280
+                    for i in str(lobbyID):
+                        label = myfont.render(i, 1, (255,140,0))
+                        screen.blit(label, (start_x, 180))
+                        start_x += 70
                     pg.display.flip()
                     clock.tick(30)
 
                     font = pg.font.Font(None, 32)
-                    input_box = pg.Rect(320, 250, 140, 32)
+                    input_box = pg.Rect(340, 250, 140, 32)
                     text = ""
                     color = pg.Color("orange")
                     done = False
@@ -148,18 +156,80 @@ def createNewLobby():
                         connect = sock.send(chat_packet.SerializeToString())
                     except:
                         print("\nError in creating/entering a lobby~")
-                    return lobbyID, username
+                        quit()
+                    return lobbyID, username, max_hosts
                 elif continue_button.collidepoint(event.pos):
-                    print("continue button was pressed!")
-                    lobbyID = input("\nEnter lobby ID: ")
-                    username = input("\nEnter username: ")
+                    screen.blit(bg, (0, 0))
+                    enterLobbyID = pg.image.load("EnterLobbyID.png")
+                    screen.blit(enterLobbyID, (0, -150))
+                    pg.display.flip()
+                    clock.tick(30)
+
+                    font = pg.font.Font(None, 32)
+                    input_box = pg.Rect(340, 110, 140, 32)
+                    text = ""
+                    color = pg.Color("orange")
+                    done = False
+                    lobbyID = ""
+                    while not done:
+                        for event in pg.event.get():
+                            if event.type == pg.QUIT:
+                                done = True
+                            if event.type == pg.KEYDOWN:
+                                if event.key == pg.K_RETURN:
+                                    lobbyID = text
+                                    done = True
+                                    text = ''
+                                elif event.key == pg.K_BACKSPACE:
+                                    text = text[:-1]
+                                else:
+                                    text += event.unicode
+                        txt_surface = font.render(text, True, color)
+                        width = max(200, txt_surface.get_width()+10)
+                        input_box.w = width
+                        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+                        pg.draw.rect(screen, color, input_box, 2)
+                        pg.display.flip()
+                        clock.tick(30)
+
+                    enterLobbyID = pg.image.load("EnterLobbyID.png")
+                    screen.blit(enterLobbyID, (0, 0))
+                    pg.display.flip()
+                    clock.tick(30)
+                    input_box = pg.Rect(340, 260, 140, 32)
+                    text = ""
+                    color = pg.Color("orange")
+                    done = False
+                    username = ""
+                    while not done:
+                        for event in pg.event.get():
+                            if event.type == pg.QUIT:
+                                done = True
+                            if event.type == pg.KEYDOWN:
+                                if event.key == pg.K_RETURN:
+                                    username = text
+                                    done = True
+                                    text = ''
+                                elif event.key == pg.K_BACKSPACE:
+                                    text = text[:-1]
+                                else:
+                                    text += event.unicode
+                        txt_surface = font.render(text, True, color)
+                        width = max(200, txt_surface.get_width()+10)
+                        input_box.w = width
+                        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+                        pg.draw.rect(screen, color, input_box, 2)
+                        pg.display.flip()
+                        clock.tick(30)
+
                     chat_packet.player.name = username
                     chat_packet.lobby_id = lobbyID
                     try:
                         connect = sock.send(chat_packet.SerializeToString())
                     except:
                         print("\nError in creating/entering a lobby~")
-                    return lobbyID, username
+                        quit()
+                    return lobbyID, username, 0
                 elif quit_button.collidepoint(event.pos):
                     print("quit button was pressed!")
                     quit()
@@ -200,6 +270,12 @@ def listPlayers():
 
 
 def startChat():
+    screen.blit(bg, (0, 0))
+    waitOtherPlayers = pg.image.load("waitingPlayers.png")
+    screen.blit(waitOtherPlayers, (0, 0))
+    pg.display.flip()
+    clock.tick(30)
+
     chat_send.player.name = username
     chat_send.lobby_id = lobbyID
     receiving_thread = Thread(target=receiveData, args=[evaluateData])
@@ -257,6 +333,6 @@ listp_packet.type = packet.PLAYER_LIST
 isBreak = False
 if (isBreak == False):
     pg.init()
-    lobbyID, username = createNewLobby()
+    lobbyID, username, max_hosts = createNewLobby()
     startChat()
     pg.quit()
