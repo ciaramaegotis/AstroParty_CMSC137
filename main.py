@@ -20,8 +20,6 @@ def receiveData(callback):
         callback(data)
 
 def paintNewPlayer():
-    print(current_num_of_players)
-    print("HAHAHAHAHAHA :(")
     if (current_num_of_players == 1):
         pg.draw.rect(screen,(0,0,0),(700,200,50,50));
     elif (current_num_of_players == 2):
@@ -333,8 +331,8 @@ def startChat():
     receiving_thread = Thread(target=receiveData, args=[evaluateData])
     receiving_thread.start()
 
-    font = pg.font.Font(None, 32)
-    input_box = pg.Rect(320, 250, 140, 32)
+    font = pg.font.Font(None, 20)
+    input_box = pg.Rect(20, 400, 220, 40)
     message = ""
     color = pg.Color("orange")
     #listen to the start button and to the chatbox and to the incoming players
@@ -370,6 +368,14 @@ def startChat():
                     message = message[:-1]
                 else:
                     message += event.unicode
+        screen.blit(bg, (0, 0))
+        screen.blit(waitOtherPlayers, (200, -100))
+        screen.blit(chat_panel, (5, 5))
+        screen.blit(player_1, (380, 90))
+        screen.blit(player_2, (380, 270))
+        screen.blit(player_3, (570, 90))
+        screen.blit(player_4, (570, 270))
+        screen.blit(start_button, (600, 120))
         txt_surface = font.render(message, True, color)
         width = max(200, txt_surface.get_width()+10)
         input_box.w = width
