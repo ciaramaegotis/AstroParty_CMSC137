@@ -13,6 +13,7 @@ screen = pg.display.set_mode((850, 450))
 bg = pg.image.load("background.jpeg")
 clock = pg.time.Clock()
 current_num_of_players = 0
+chat_transcript = []
 
 def receiveData(callback):
     while True:
@@ -43,16 +44,19 @@ def evaluateData(data):
     if (packet.type == packet.CONNECT):
         chat_packet.ParseFromString(data)
         print("\n{} joined the chat.".format(chat_packet.player.name))
+        chat_transcript.append(chat_packet.player.name + " joined the chat.")
         current_num_of_players += 1
         paintNewPlayer()
     elif (packet.type == packet.CHAT):
         chat_send.ParseFromString(data)
         print("\n{}: {}".format(chat_send.player.name, chat_send.message))
+        chat_transcript.append(chat_send.player.name + ": " + chat_send.message)
     elif (packet.type == packet.ERR_LDNE):
         print("This prints if the Lobby doesn't exist")
         createNewLobby()
     elif (packet.type == packet.DISCONNECT):
         print("\n{} disconnected from chat.".format(chat_packet.player.name))
+        chat_transcript.append(chat_packet.player.name + " disconnected from chat.")
         if (chat_packet.player.name == username):
             quit()
     elif (packet.type == packet.ERR_LFULL):
@@ -377,6 +381,13 @@ def startChat():
         screen.blit(player_4, (570, 270))
         screen.blit(start_button, (600, 120))
         txt_surface = font.render(message, True, color)
+        global chat_transcript
+        start_y = 30
+        myfont = pg.font.SysFont("monospace", 20)
+        for trans in chat_transcript:
+            label = myfont.render(trans, 1, (255,140,0))
+            screen.blit(label, (20, start_y))
+            start_y += 20
         width = max(200, txt_surface.get_width()+10)
         input_box.w = width
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
