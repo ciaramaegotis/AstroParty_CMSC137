@@ -272,7 +272,24 @@ def listPlayers():
 def startChat():
     screen.blit(bg, (0, 0))
     waitOtherPlayers = pg.image.load("waitingPlayers.png")
-    screen.blit(waitOtherPlayers, (0, 0))
+    waitOtherPlayers = pg.transform.scale(waitOtherPlayers, (700, 300))
+    chat_panel = pg.image.load("chat_panel.png");
+    chat_panel = pg.transform.scale(chat_panel, (250, 440))
+    player_1 = pg.image.load("chat_panel.png")
+    player_1 = pg.transform.scale(player_1, (150, 150));
+    player_2 = pg.image.load("chat_panel.png")
+    player_2 = pg.transform.scale(player_2, (150, 150));
+    player_3 = pg.image.load("chat_panel.png")
+    player_3 = pg.transform.scale(player_3, (150, 150));
+    player_4 = pg.image.load("chat_panel.png")
+    player_4 = pg.transform.scale(player_4, (150, 150));
+    
+    screen.blit(waitOtherPlayers, (200, -100))
+    screen.blit(chat_panel, (5, 5))
+    screen.blit(player_1, (350, 90))
+    screen.blit(player_2, (350, 270))
+    screen.blit(player_3, (600, 90))
+    screen.blit(player_4, (600, 270))
     pg.display.flip()
     clock.tick(30)
 
@@ -284,7 +301,7 @@ def startChat():
     while (True):
         try:
             message = input("")
-            if(message == "dc()"):
+            if(messag == "dc()"):
                 chat_disconnect.player.name = username
                 sock.send(chat_disconnect.SerializeToString())
                 isBreak = True
