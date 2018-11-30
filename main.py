@@ -254,8 +254,9 @@ def createNewLobby():
                     except:
                         print("\nError in creating/entering a lobby~")
                         quit()
-                    global current_num_of_players
-                    current_num_of_players = len(listPlayers())
+                    #to be continued once listPlayers() is fully working again
+                    # global current_num_of_players
+                    # current_num_of_players = len(listPlayers())
                     return lobbyID, username, 0
                 elif quit_button.collidepoint(event.pos):
                     print("quit button was pressed!")
@@ -281,12 +282,6 @@ def createNewLobby():
         screen.blit(astro_party, (270, 100))
         pg.display.flip()
         clock.tick(30)
-def listPlayers():
-    data = sock.send(listp_packet.SerializeToString())
-    data = sock.recv(1024)
-    listp_packet.ParseFromString(data)
-    return listp_packet.player_list
-
 
 
 def listPlayers():
