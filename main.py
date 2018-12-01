@@ -69,8 +69,8 @@ def gameProper():
                 label = myfont.render(trans, 1, (255,140,0))
                 screen.blit(label, (20, start_y))
                 start_y += 20
-            width = max(200, txt_surface.get_width()+10)
-            input_box.w = width
+            #width = max(200, txt_surface.get_width()+10)
+            # input_box.w = 200
             screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
             pg.draw.rect(screen, color, input_box, 2)
             pg.display.flip()
@@ -176,8 +176,8 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        width = max(200, txt_surface.get_width()+10)
-                        input_box.w = width
+                        # width = max(200, txt_surface.get_width()+10)
+                        # input_box.w = width
                         # Render elements
                         screen.blit(bg, (0, 0))
                         screen.blit(enterHosts, (-10, -10))
@@ -222,8 +222,8 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        width = max(200, txt_surface.get_width()+10)
-                        input_box.w = width
+                        # width = max(200, txt_surface.get_width()+10)
+                        # input_box.w = width
                         # Render Elements
                         screen.blit(bg, (0, 0))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -278,8 +278,8 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        width = max(200, txt_surface.get_width()+10)
-                        input_box.w = width
+                        # width = max(200, txt_surface.get_width()+10)
+                        # input_box.w = width
                         screen.blit(bg, (0, 0))
                         screen.blit(enterLobbyID, (0, 0))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -310,8 +310,8 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        width = max(200, txt_surface.get_width()+10)
-                        input_box.w = width
+                        # width = max(200, txt_surface.get_width()+10)
+                        # input_box.w = width
                         screen.blit(bg, (0, 0))
                         screen.blit(enterUsername, (350, 200))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -391,7 +391,7 @@ def startChat():
     receiving_thread.start()
 
     font = pg.font.Font(None, 20)
-    input_box = pg.Rect(30, 400, 220, 40)
+    input_box = pg.Rect(30, 400, 200, 40)
     message = ""
     color = pg.Color("white")
     #listen to the start button and to the chatbox and to the incoming players
@@ -462,8 +462,8 @@ def startChat():
                 label = myfont.render(content, 1, (255,255,255))
                 screen.blit(label, (30, start_y))
                 start_y += 20
-        width = max(200, txt_surface.get_width()+10)
-        input_box.w = width
+        # width = max(200, txt_surface.get_width()+10)
+        # input_box.w = width
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pg.draw.rect(screen, color, input_box, 2)
         pg.display.flip()
