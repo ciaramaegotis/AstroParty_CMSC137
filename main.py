@@ -64,11 +64,24 @@ def gameProper():
             txt_surface = font.render(message, True, color)
             global chat_transcript
             start_y = 30
-            myfont = pg.font.SysFont("monospace", 20)
-            for trans in chat_transcript:
-                label = myfont.render(trans, 1, (255,140,0))
-                screen.blit(label, (20, start_y))
-                start_y += 20
+            myfont = pg.font.SysFont("monospace", 15)
+            toPrint = []
+            for content in chat_transcript:
+                if len(content) > 22:
+                    for i in range(0, len(content), 22):
+                        toPrint.append(content[i:i+22])
+                    for i in toPrint:
+                        label = myfont.render(i, 1, (255,255,255))
+                        screen.blit(label, (30, start_y))
+                        start_y += 20
+                else:
+                    label = myfont.render(content, 1, (255,255,255))
+                    screen.blit(label, (30, start_y))
+                    start_y += 20
+            # for trans in chat_transcript:
+            #     label = myfont.render(trans, 1, color)
+            #     screen.blit(label, (20, start_y))
+            #     start_y += 20
             #width = max(200, txt_surface.get_width()+10)
             # input_box.w = 200
             screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
