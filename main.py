@@ -10,7 +10,7 @@ import pygame as pg
 syntax = "proto2"
 
 screen = pg.display.set_mode((850, 450))
-bg = pg.image.load("background.jpeg")
+bg = pg.image.load("./images/background.jpeg")
 clock = pg.time.Clock()
 current_num_of_players = 0
 chat_transcript = []
@@ -18,7 +18,7 @@ chat_transcript = []
 def gameProper():
     while (True):
         screen.blit(bg, (0, 0))
-        chat_panel = pg.image.load("chat_panel.png");
+        chat_panel = pg.image.load("./images/chat_panel.png");
         chat_panel = pg.transform.scale(chat_panel, (250, 440))
         screen.blit(chat_panel, (5, 5))
         pg.display.flip()
@@ -130,25 +130,29 @@ def evaluateData(data):
 
 
 def createNewLobby():
-    start_panel = pg.image.load("CreateLobby.png")
-    join_panel = pg.image.load("joinlobby.png")
-    exit_panel = pg.image.load("exit.png")
-    astro_party = pg.image.load("astro_party.png")
+    start_panel = pg.image.load("./images/CreateLobby.png")
+    join_panel = pg.image.load("./images/joinlobby.png")
+    exit_panel = pg.image.load("./images/exit.png")
+    astro_party = pg.image.load("./images/astro_party.png")
+    enterUsername = pg.image.load("./images/enterUsername.png")
+    enterUsername = pg.transform.scale(enterUsername, (180, 20))
     start_panel = pg.transform.scale(start_panel, (250, 150))
     join_panel = pg.transform.scale(join_panel, (250, 150))
     exit_panel = pg.transform.scale(exit_panel, (250, 150))
+    
     active = False
     text = ''
     done = False
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                done = True
+                # done = True
+                quit()
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
                     print("You selected Create Lobby!\n")
                     screen.blit(bg, (0, 0))
-                    enterHosts = pg.image.load("EnterHosts.png")
+                    enterHosts = pg.image.load("./images/EnterHosts.png")
                     screen.blit(enterHosts, (-10, -10))
                     pg.display.flip()
                     clock.tick(30)
@@ -162,7 +166,7 @@ def createNewLobby():
                     while not done:
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
-                                done = True
+                                quit()
                             if event.type == pg.KEYDOWN:
                                 if event.key == pg.K_RETURN:
                                     print(text + " is the chosen max players.")
@@ -176,13 +180,16 @@ def createNewLobby():
                         txt_surface = font.render(text, True, color)
                         width = max(200, txt_surface.get_width()+10)
                         input_box.w = width
+                        # Refreshed elements bg and enterhosts; No response when backspacing
+                        screen.blit(bg, (0, 0))
+                        screen.blit(enterHosts, (-10, -10))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
                         pg.draw.rect(screen, color, input_box, 2)
                         pg.display.flip()
                         clock.tick(30)
-
                     pg.display.flip()
                     clock.tick(30)
+
                     packet.type = packet.CREATE_LOBBY
                     lobbyDetails = packet.CreateLobbyPacket()
                     lobbyDetails.type = packet.CREATE_LOBBY
@@ -193,20 +200,16 @@ def createNewLobby():
                     lobbyDetails.ParseFromString(room)
                     lobbyID = lobbyDetails.lobby_id
 
+                    # Enter Username Screen
                     screen.blit(bg, (0, 0))
-                    lobbyIDPic = pg.image.load("LobbyID.png")
-                    lobbyidval = pg.image.load("lobbyidval.png")
+                    lobbyIDPic = pg.image.load("./images/LobbyID.png")
+                    lobbyidval = pg.image.load("./images/lobbyidval.png")
                     screen.blit(lobbyIDPic, (10, -100))
                     screen.blit(lobbyidval, (-10, -30))
+                    screen.blit(enterUsername, (350, 290))
                     myfont = pg.font.SysFont("monospace", 50)
-                    start_x = 280
-                    for i in str(lobbyID):
-                        label = myfont.render(i, 1, (255,140,0))
-                        screen.blit(label, (start_x, 180))
-                        start_x += 70
-                    pg.display.flip()
-                    clock.tick(30)
 
+                    # Username Input
                     font = pg.font.Font(None, 32)
                     input_box = pg.Rect(340, 250, 140, 32)
                     text = ""
@@ -216,7 +219,8 @@ def createNewLobby():
                     while not done:
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
-                                done = True
+                                quit()
+                                # done = True
                             if event.type == pg.KEYDOWN:
                                 if event.key == pg.K_RETURN:
                                     print(text + " is the host's username")
@@ -230,8 +234,21 @@ def createNewLobby():
                         txt_surface = font.render(text, True, color)
                         width = max(200, txt_surface.get_width()+10)
                         input_box.w = width
+                        # Update
+                        screen.blit(bg, (0, 0))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+                        screen.blit(lobbyIDPic, (10, -100))
+                        screen.blit(lobbyidval, (-10, -30))
+                        screen.blit(enterUsername, (350, 290))
                         pg.draw.rect(screen, color, input_box, 2)
+                        # Render Lobby ID
+                        lobbyID_start_x = 280
+                        for char in str(lobbyID):
+                            label = myfont.render(char, 1, (255,140,0))
+                            screen.blit(label, (lobbyID_start_x, 180))
+                            lobbyID_start_x += 70
+                        pg.display.flip()
+                        clock.tick(30)
                         pg.display.flip()
                         clock.tick(30)
 
@@ -246,7 +263,7 @@ def createNewLobby():
                     return lobbyID, username, max_hosts
                 elif continue_button.collidepoint(event.pos):
                     screen.blit(bg, (0, 0))
-                    enterLobbyID = pg.image.load("EnterLobbyID.png")
+                    enterLobbyID = pg.image.load("./images/EnterLobbyID.png")
                     screen.blit(enterLobbyID, (0, -150))
                     pg.display.flip()
                     clock.tick(30)
@@ -278,7 +295,7 @@ def createNewLobby():
                         pg.display.flip()
                         clock.tick(30)
 
-                    enterLobbyID = pg.image.load("EnterLobbyID.png")
+                    enterLobbyID = pg.image.load("./images/EnterLobbyID.png")
                     screen.blit(enterLobbyID, (0, 0))
                     pg.display.flip()
                     clock.tick(30)
@@ -331,7 +348,6 @@ def createNewLobby():
                         text = text[:-1]
                     else:
                         text += event.unicode
-
         screen.fill((10, 10, 10))
         screen.blit(bg, (0, 0))
         start_button = pg.draw.rect(screen,(0,0,0),(360,250,149,49));
@@ -355,21 +371,21 @@ def listPlayers():
 def startChat():
     paintNewPlayer()
     screen.blit(bg, (0, 0))
-    waitOtherPlayers = pg.image.load("waitingPlayers.png")
+    waitOtherPlayers = pg.image.load("./images/waitingPlayers.png")
     waitOtherPlayers = pg.transform.scale(waitOtherPlayers, (700, 300))
-    chat_panel = pg.image.load("chat_panel.png");
+    chat_panel = pg.image.load("./images/chat_panel.png");
     chat_panel = pg.transform.scale(chat_panel, (250, 440))
-    start_button = pg.image.load("backbut.png")
+    start_button = pg.image.load("./images/backbut.png")
     start_button = pg.transform.scale(start_button, (400, 250))
     start_button = pg.transform.flip(start_button, True, False);
 
-    player_1 = pg.image.load("chat_panel.png")
+    player_1 = pg.image.load("./images/chat_panel.png")
     player_1 = pg.transform.scale(player_1, (150, 150));
-    player_2 = pg.image.load("chat_panel.png")
+    player_2 = pg.image.load("./images/chat_panel.png")
     player_2 = pg.transform.scale(player_2, (150, 150));
-    player_3 = pg.image.load("chat_panel.png")
+    player_3 = pg.image.load("./images/chat_panel.png")
     player_3 = pg.transform.scale(player_3, (150, 150));
-    player_4 = pg.image.load("chat_panel.png")
+    player_4 = pg.image.load("./images/chat_panel.png")
     player_4 = pg.transform.scale(player_4, (150, 150));
 
     
