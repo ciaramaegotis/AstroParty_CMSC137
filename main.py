@@ -106,7 +106,10 @@ def receiveData(callback):
         data = sock.recv(2048)
         callback(data)
 
+#this method creates a black triangle and paints it on the window everytime a new player arrives (should be displayed in the lobby)
 def paintNewPlayer():
+    global current_num_of_players
+    current_num_of_players = len(listPlayers())
     if (current_num_of_players == 1):
         pg.draw.rect(screen,(0,0,0),(700,200,50,50))
     elif (current_num_of_players == 2):
@@ -131,8 +134,8 @@ def evaluateData(data):
         chat_packet.ParseFromString(data)
         print("\n{} joined the chat.".format(chat_packet.player.name))
         chat_transcript.append(chat_packet.player.name + " joined the chat.")
-        current_num_of_players += 1
-        paintNewPlayer()
+        #TO DO: temporary comment bc of listPlayers()
+        #paintNewPlayer()
     elif (packet.type == packet.CHAT):
         chat_send.ParseFromString(data)
         print("\n{}: {}".format(chat_send.player.name, chat_send.message))
@@ -140,7 +143,7 @@ def evaluateData(data):
     elif (packet.type == packet.ERR_LDNE):
         print("This prints if the Lobby doesn't exist")
         createNewLobby()
-    elif (packet.type == packet.DISCONNECT):
+    elif (packet.type == packet.DISCONNECT):    #TO DO: should repaint the lobby if a player disconnected in the lobby 
         print("\n{} disconnected from chat.".format(chat_packet.player.name))
         chat_transcript.append(chat_packet.player.name + " disconnected from chat.")
         if (chat_packet.player.name == username):
@@ -200,8 +203,6 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        # width = max(200, txt_surface.get_width()+10)
-                        # input_box.w = width
                         # Render elements
                         screen.blit(bg, (0, 0))
                         screen.blit(enterHosts, (-10, -10))
@@ -302,8 +303,6 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        # width = max(200, txt_surface.get_width()+10)
-                        # input_box.w = width
                         screen.blit(bg, (0, 0))
                         screen.blit(enterLobbyID, (0, 0))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -334,8 +333,6 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        # width = max(200, txt_surface.get_width()+10)
-                        # input_box.w = width
                         screen.blit(bg, (0, 0))
                         screen.blit(enterUsername, (350, 200))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -350,9 +347,6 @@ def createNewLobby():
                     except:
                         print("\nError in creating/entering a lobby~")
                         quit()
-                    #to be continued once listPlayers() is fully working again
-                    # global current_num_of_players
-                    # current_num_of_players = len(listPlayers())
                     return lobbyID, username, 0
                 elif quit_button.collidepoint(event.pos):
                     print("quit button was pressed!")
@@ -387,7 +381,8 @@ def listPlayers():
 
 
 def startChat():
-    paintNewPlayer()
+    #TO DO: temporary comment because of listPlayers()
+    #paintNewPlayer()
     screen.blit(bg, (0, 0))
     waitOtherPlayers = pg.image.load("./images/waitingPlayers.png")
     waitOtherPlayers = pg.transform.scale(waitOtherPlayers, (700, 300))
