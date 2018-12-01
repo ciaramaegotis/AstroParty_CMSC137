@@ -85,6 +85,7 @@ def gameProper():
                         label = myfont.render(i, 1, (255,255,255))
                         screen.blit(label, (30, start_y))
                         start_y += 20
+                    toPrint = []
                 else:
                     label = myfont.render(content, 1, (255,255,255))
                     screen.blit(label, (30, start_y))
@@ -491,6 +492,7 @@ def startChat():
                     label = myfont.render(i, 1, (255,255,255))
                     screen.blit(label, (30, start_y))
                     start_y += 20
+                toPrint = []
             else:
                 label = myfont.render(content, 1, (255,255,255))
                 screen.blit(label, (30, start_y))
