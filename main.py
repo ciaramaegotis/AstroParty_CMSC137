@@ -14,8 +14,10 @@ bg = pg.image.load("./images/background.jpeg")
 clock = pg.time.Clock()
 current_num_of_players = 0
 chat_transcript = []
+host = "" #TO DO: save here the host (only the host can click the start game)
 
 def gameProper():
+    active = False
     while (True):
         screen.blit(bg, (0, 0))
         chat_panel = pg.image.load("./images/chat_panel.png");
@@ -34,31 +36,42 @@ def gameProper():
                 if event.type == pg.QUIT:
                     quit()
                     break
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RETURN:
-                        #send the message
-                        try:
-                            if(message == "dc()"):
-                                chat_disconnect.player.name = username
-                                sock.send(chat_disconnect.SerializeToString())
-                                isBreak = True
-                                quit()
-                            elif(message == "list()"):
-                                playersList = listPlayers()
-                                for player in playersList:
-                                    print(player)
-                                print(">> ", end='')
-                            else:
-                                chat_send.message = message
-                                sock.send(chat_send.SerializeToString())
-                        except OSError:
-                            print("\nError")
-                        done = True
-                        message = ''
-                    elif event.key == pg.K_BACKSPACE:
-                        message = message[:-1]
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if input_box.collidepoint(event.pos):
+                        active = True
                     else:
-                        message += event.unicode
+                        active = False
+                if event.type == pg.KEYDOWN:
+                    if (active == False):
+                        if (event.key == pg.K_r):
+                            print("ROTATE!\n")
+                        if (event.key == pg.K_e or event.key == pg.K_SPACE):
+                            print("SHOOT!\n")
+                    else:
+                        if event.key == pg.K_RETURN:
+                            #send the message
+                            try:
+                                if(message == "dc()"):
+                                    chat_disconnect.player.name = username
+                                    sock.send(chat_disconnect.SerializeToString())
+                                    isBreak = True
+                                    quit()
+                                elif(message == "list()"):
+                                    playersList = listPlayers()
+                                    for player in playersList:
+                                        print(player)
+                                    print(">> ", end='')
+                                else:
+                                    chat_send.message = message
+                                    sock.send(chat_send.SerializeToString())
+                            except OSError:
+                                print("\nError")
+                            done = True
+                            message = ''
+                        elif event.key == pg.K_BACKSPACE:
+                            message = message[:-1]
+                        else:
+                            message += event.unicode
             screen.blit(bg, (0, 0))
             screen.blit(chat_panel, (5, 5))
             #split the display in the chat box if length exceeds 22
@@ -92,12 +105,7 @@ def gameProper():
                     label = myfont.render(content, 1, (255,255,255))
                     screen.blit(label, (30, start_y))
                     start_y += 20
-            # for trans in chat_transcript:
-            #     label = myfont.render(trans, 1, color)
-            #     screen.blit(label, (20, start_y))
-            #     start_y += 20
-            #width = max(200, txt_surface.get_width()+10)
-            # input_box.w = 200
+
             pg.draw.rect(screen, color, input_box, 2)
             pg.display.flip()
             clock.tick(30)
@@ -249,8 +257,6 @@ def createNewLobby():
                                 else:
                                     text += event.unicode
                         txt_surface = font.render(text, True, color)
-                        # width = max(200, txt_surface.get_width()+10)
-                        # input_box.w = width
                         # Render Elements
                         screen.blit(bg, (0, 0))
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
@@ -425,6 +431,7 @@ def startChat():
                 break
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start_button_detector.collidepoint(event.pos):
+                    #TO DO: check first if the clicker is the host
                     print("START GAME!")
                     gameProper()
             if event.type == pg.KEYDOWN:
@@ -496,8 +503,6 @@ def startChat():
                 label = myfont.render(content, 1, (255,255,255))
                 screen.blit(label, (30, start_y))
                 start_y += 20
-        # width = max(200, txt_surface.get_width()+10)
-        # input_box.w = width
         pg.draw.rect(screen, color, input_box, 2)
         pg.display.flip()
         clock.tick(30)
