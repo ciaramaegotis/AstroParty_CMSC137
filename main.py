@@ -63,6 +63,8 @@ def gameProper():
             screen.blit(chat_panel, (5, 5))
             #split the display in the chat box if length exceeds 22
             if (len(message) > 25):
+                if (len(message) > 50):
+                    message = message[0:50]
                 start_y = 0
                 for i in range(0, len(message), 25):
                     output = message[i:i+25]
@@ -465,6 +467,8 @@ def startChat():
 
         #split the display in the chat box if length exceeds 22
         if (len(message) > 25):
+            if (len(message) > 50):
+                message = message[0:50]
             start_y = 0
             for i in range(0, len(message), 25):
                 output = message[i:i+25]
