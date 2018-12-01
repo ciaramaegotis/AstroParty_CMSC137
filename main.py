@@ -14,11 +14,18 @@ bg = pg.image.load("./images/background.jpeg")
 clock = pg.time.Clock()
 current_num_of_players = 0
 chat_transcript = []
+players = [] #TO DO: once startgame is clicked, get the final list of players
 host = "" #TO DO: save here the host (only the host can click the start game)
 
+def checkState():
+    #check for collisions and score updates
+    return(0)
+
 def gameProper():
+    #TO DO: instantiate a thread for the space ship
     active = False
     while (True):
+        checkState()
         screen.blit(bg, (0, 0))
         chat_panel = pg.image.load("./images/chat_panel.png");
         chat_panel = pg.transform.scale(chat_panel, (250, 440))
@@ -433,6 +440,9 @@ def startChat():
                 if start_button_detector.collidepoint(event.pos):
                     #TO DO: check first if the clicker is the host
                     print("START GAME!")
+                    #TO DO: get the final list of players
+                    #global players
+                    #players = listPlayers()
                     gameProper()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
