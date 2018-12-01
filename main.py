@@ -61,7 +61,18 @@ def gameProper():
                         message += event.unicode
             screen.blit(bg, (0, 0))
             screen.blit(chat_panel, (5, 5))
-            txt_surface = font.render(message, True, color)
+            #split the display in the chat box if length exceeds 22
+            if (len(message) > 25):
+                start_y = 0
+                for i in range(0, len(message), 25):
+                    output = message[i:i+25]
+                    txt_surface = font.render(output, True, pg.Color("white"))
+                    screen.blit(txt_surface, (input_box.x+5, input_box.y+5+start_y))
+                    start_y += 15
+            else:
+                txt_surface = font.render(message, True, pg.Color("white"))
+                screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+
             global chat_transcript
             start_y = 30
             myfont = pg.font.SysFont("monospace", 15)
@@ -84,7 +95,6 @@ def gameProper():
             #     start_y += 20
             #width = max(200, txt_surface.get_width()+10)
             # input_box.w = 200
-            screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
             pg.draw.rect(screen, color, input_box, 2)
             pg.display.flip()
             clock.tick(30)
@@ -457,7 +467,17 @@ def startChat():
         # Split string in text box para kumasya ang inputs
         textbox = []
 
-        txt_surface = font.render(message, True, pg.Color("white"))
+        #split the display in the chat box if length exceeds 22
+        if (len(message) > 25):
+            start_y = 0
+            for i in range(0, len(message), 25):
+                output = message[i:i+25]
+                txt_surface = font.render(output, True, pg.Color("white"))
+                screen.blit(txt_surface, (input_box.x+5, input_box.y+5+start_y))
+                start_y += 15
+        else:
+            txt_surface = font.render(message, True, pg.Color("white"))
+            screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         global chat_transcript
         start_y = 30
         myfont = pg.font.SysFont("monospace", 15)
@@ -477,7 +497,6 @@ def startChat():
                 start_y += 20
         # width = max(200, txt_surface.get_width()+10)
         # input_box.w = width
-        screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pg.draw.rect(screen, color, input_box, 2)
         pg.display.flip()
         clock.tick(30)
