@@ -17,6 +17,7 @@ chat_transcript = []
 players = [] #TO DO: once startgame is clicked, get the final list of players
 host = "" #TO DO: save here the host (only the host can click the start game)
 
+
 def checkState():
     #check for collisions and score updates
     return(0)
@@ -63,11 +64,11 @@ def gameProper():
                                     sock.send(chat_disconnect.SerializeToString())
                                     isBreak = True
                                     quit()
-                                elif(message == "list()"):
-                                    playersList = listPlayers()
-                                    for player in playersList:
-                                        print(player)
-                                    print(">> ", end='')
+                                # elif(message == "list()"):
+                                #     playersList = listPlayers()
+                                #     for player in playersList:
+                                #         print(player)
+                                #     print(">> ", end='')
                                 else:
                                     chat_send.message = message
                                     sock.send(chat_send.SerializeToString())
@@ -117,10 +118,9 @@ def gameProper():
             pg.display.flip()
             clock.tick(30)
 
-
 def receiveData(callback):
     while True:
-        data = sock.recv(2048)
+        data = sock.recv(1024)
         callback(data)
 
 #this method creates a black triangle and paints it on the window everytime a new player arrives (should be displayed in the lobby)
@@ -176,7 +176,6 @@ def evaluateData(data):
         print("An error occured.")
     print(">> ", end='')
     stdout.flush()
-
 
 def createNewLobby():
     start_panel = pg.image.load("./images/CreateLobby.png")
@@ -450,6 +449,8 @@ def startChat():
                             isBreak = True
                             quit()
                         elif(message == "list()"):
+                            listp_packet = packet.PlayerListPacket()
+                            listp_packet.type = packet.PLAYER_LIST
                             sock.send(listp_packet.SerializeToString())
                             print(">> ", end='')
                         else:
@@ -502,11 +503,7 @@ def startChat():
                     label = myfont.render(i, 1, (255,255,255))
                     screen.blit(label, (30, start_y))
                     start_y += 20
-<<<<<<< Updated upstream
                 toPrint = []
-=======
-                toPrint=[]
->>>>>>> Stashed changes
             else:
                 label = myfont.render(content, 1, (255,255,255))
                 screen.blit(label, (30, start_y))
@@ -544,7 +541,6 @@ chat_disconnect.type = packet.DISCONNECT
 
  # List Players Packet
 listp_packet = packet.PlayerListPacket()
-listp_packet.type = packet.PLAYER_LIST
 
 isBreak = False
 if (isBreak == False):
