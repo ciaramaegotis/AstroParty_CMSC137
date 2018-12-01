@@ -168,6 +168,10 @@ def evaluateData(data):
     elif (packet.type == packet.ERR_LFULL):
         print("This prints if the Lobby is already full")
         createNewLobby()
+    elif (packet.type == packet.PLAYER_LIST):
+        listp_packet.ParseFromString(data)
+        for player in listp_packet.player_list:
+            print(player)
     elif (packet.type == packet.ERR):
         print("An error occured.")
     print(">> ", end='')
@@ -387,14 +391,6 @@ def createNewLobby():
         pg.display.flip()
         clock.tick(30)
 
-
-def listPlayers():
-    data = sock.send(listp_packet.SerializeToString())
-    data = sock.recv(1024)
-    listp_packet.ParseFromString(data)
-    return listp_packet.player_list
-
-
 def startChat():
     #TO DO: temporary comment because of listPlayers()
     #paintNewPlayer()
@@ -454,9 +450,7 @@ def startChat():
                             isBreak = True
                             quit()
                         elif(message == "list()"):
-                            playersList = listPlayers()
-                            for player in playersList:
-                                print(player)
+                            sock.send(listp_packet.SerializeToString())
                             print(">> ", end='')
                         else:
                             chat_send.message = message
@@ -508,7 +502,11 @@ def startChat():
                     label = myfont.render(i, 1, (255,255,255))
                     screen.blit(label, (30, start_y))
                     start_y += 20
+<<<<<<< Updated upstream
                 toPrint = []
+=======
+                toPrint=[]
+>>>>>>> Stashed changes
             else:
                 label = myfont.render(content, 1, (255,255,255))
                 screen.blit(label, (30, start_y))
@@ -544,7 +542,7 @@ chat_send.type = packet.CHAT
 chat_disconnect = packet.DisconnectPacket()
 chat_disconnect.type = packet.DISCONNECT
 
-# List Players Packet
+ # List Players Packet
 listp_packet = packet.PlayerListPacket()
 listp_packet.type = packet.PLAYER_LIST
 
