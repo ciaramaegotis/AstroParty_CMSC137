@@ -203,7 +203,7 @@ def createNewLobby():
                 if start_button.collidepoint(event.pos):
                     print("You selected Create Lobby!\n")
                     font = pg.font.Font(None, 32)
-                    input_box = pg.Rect(320, 250, 140, 32)
+                    input_box = pg.Rect(400, 250, 40, 32)
                     text = ""
                     color = pg.Color("white")
                     done = False
@@ -246,7 +246,7 @@ def createNewLobby():
                     # Enter Username Screen
                     myfont = pg.font.SysFont("monospace", 50)
                     font = pg.font.Font(None, 32)
-                    input_box = pg.Rect(340, 250, 140, 32)
+                    input_box = pg.Rect(335, 260, 200, 32)
                     text = ""
                     color = pg.Color("white")
                     done = False
@@ -272,7 +272,7 @@ def createNewLobby():
                         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
                         screen.blit(lobbyIDPic, (10, -100))
                         screen.blit(lobbyidval, (-10, -30))
-                        screen.blit(enterUsername, (350, 290))
+                        screen.blit(enterUsername, (345, 295))
                         pg.draw.rect(screen, pg.Color("#EB5500"), input_box, 2)
                         # Render Lobby ID
                         lobbyID_start_x = 280
@@ -514,7 +514,7 @@ def startChat():
 
 
 
-######################################################################################
+#############################################################################################################################################3
 # Create a TCP/IP socket and connect the socket to the port where the server is listening
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ("202.92.144.45", 80)
