@@ -6,6 +6,7 @@ import socket
 from sys import stdout
 from threading import Thread
 import pygame as pg
+import time
 
 syntax = "proto2"
 
@@ -14,9 +15,8 @@ bg = pg.image.load("./images/background.jpeg")
 clock = pg.time.Clock()
 current_num_of_players = 0
 chat_transcript = []
-players = [] #TO DO: once startgame is clicked, get the final list of players
 host = "" #TO DO: save here the host (only the host can click the start game)
-
+players = [] #TO DO: once startgame is clicked, get the final list of players
 
 def checkState():
     #check for collisions and score updates
@@ -145,6 +145,7 @@ def paintNewPlayer():
     clock.tick(30)
 
 def evaluateData(data):
+    global players
     global current_num_of_players
     packet.ParseFromString(data)
     if (packet.type == packet.CONNECT):
@@ -169,9 +170,10 @@ def evaluateData(data):
         print("This prints if the Lobby is already full")
         createNewLobby()
     elif (packet.type == packet.PLAYER_LIST):
+        players = []
         listp_packet.ParseFromString(data)
         for player in listp_packet.player_list:
-            print(player)
+            players.append(player)
     elif (packet.type == packet.ERR):
         print("An error occured.")
     print(">> ", end='')
@@ -197,7 +199,6 @@ def createNewLobby():
     while not done:
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                # done = True
                 quit()
             if event.type == pg.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
@@ -255,7 +256,6 @@ def createNewLobby():
                         for event in pg.event.get():
                             if event.type == pg.QUIT:
                                 quit()
-                                # done = True
                             if event.type == pg.KEYDOWN:
                                 if event.key == pg.K_RETURN:
                                     print(text + " is the host's username")
@@ -302,7 +302,7 @@ def createNewLobby():
                     clock.tick(30)
 
                     font = pg.font.Font(None, 32)
-                    input_box = pg.Rect(340, 275, 140, 32)
+                    input_box = pg.Rect(340, 275, 170, 32)
                     text = ""
                     color = pg.Color("white")
                     done = False
@@ -332,7 +332,7 @@ def createNewLobby():
                     screen.blit(enterUsername, (350, 200))
                     pg.display.flip()
                     clock.tick(30)
-                    input_box = pg.Rect(340, 235, 140, 32)
+                    input_box = pg.Rect(340, 235, 195, 32)
                     text = ""
                     color = pg.Color("white")
                     done = False
@@ -389,6 +389,13 @@ def createNewLobby():
         screen.blit(astro_party, (270, 100))
         pg.display.flip()
         clock.tick(30)
+
+
+def updatePlayers():
+    listp_packet = packet.PlayerListPacket()
+    listp_packet.type = packet.PLAYER_LIST
+    sock.send(listp_packet.SerializeToString())
+    time.sleep(0.5)
 
 def startChat():
     #TO DO: temporary comment because of listPlayers()
@@ -449,10 +456,8 @@ def startChat():
                             isBreak = True
                             quit()
                         elif(message == "list()"):
-                            listp_packet = packet.PlayerListPacket()
-                            listp_packet.type = packet.PLAYER_LIST
-                            sock.send(listp_packet.SerializeToString())
-                            print(">> ", end='')
+                            updatePlayers()
+                            print(players)
                         else:
                             chat_send.message = message
                             sock.send(chat_send.SerializeToString())
