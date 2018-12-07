@@ -5,8 +5,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 ORANGE = (255, 140, 0)
  
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
  
  
 class Player(pygame.sprite.Sprite):
@@ -213,7 +213,7 @@ while not done:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
             	player.rotate()
-            elif event.key == pygame.K_e:
+            elif (event.key == pygame.K_e or event.key == pygame.K_SPACE):
             	player.fire()
  
     all_sprite_list.update()
