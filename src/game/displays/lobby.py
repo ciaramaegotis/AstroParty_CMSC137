@@ -4,29 +4,61 @@ import pygame as pg
 # move up one directory to be able to import the images
 sys.path.append("..")
 from utils.button import Button
-from variables import *
-from images import *
+from utils.variables import *
+from utils.images import *
+from chat import Chat
 
 class Lobby:
     def __init__(self, game):
         self.game = game
+        self.game.chat = Chat(self.game)
+        self.game.lobby_id = self.game.chat.createLobby(4).lobby_id
+        self.game.chat.connectToLobby(self.game.lobby_id, self.game.username)
+
         back = Button('backButton', 530, 600, 224, 64)
         start = Button('nextButton', 950, 600, 220, 63)
         
+        message = ""
         while self.game.currentDisplay == PLAYER_LOBBY:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game.running = False
                     quit()
-                
-                if event.type == pg.MOUSEBUTTONDOWN:
+
+                elif event.type == pg.MOUSEBUTTONDOWN:
                     if back.raw.get_rect(topleft=(back.x,back.y)).collidepoint(event.pos):
                         self.game.currentDisplay = MAIN_MENU
+                        self.game.chatTranscript = []
                         break
                     elif start.raw.get_rect(topleft=(start.x,start.y)).collidepoint(event.pos):
                         print("Start Pressed!")
                         # break
-            
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        try:
+                            if(message == "dc()"):
+                                self.game.chat.disconnectChat()
+                                # chat_disconnect.player.name = username
+                                # sock.send(chat_disconnect.SerializeToString())
+                                # isBreak = True
+                                # quit()
+                            elif(message == "list()"):
+                                print("list!")
+                                # updatePlayers()
+                                # print(players)
+                            else:
+                                self.game.chat.sendMessage(message)
+
+                        except OSError:
+                            print("\nError")
+                        done = True
+                        message = ''
+                    elif event.key == pg.K_BACKSPACE:
+                        message = message[:-1]
+                    else:
+                        message += event.unicode
+                
+            # Render background elements
             self.game.screen.blit(menuBackground, (0,0))
             self.game.screen.blit(chatPanel, (-20, 33))
             self.game.screen.blit(waitOtherPlayers, (415, 70))
@@ -36,5 +68,27 @@ class Lobby:
             self.game.screen.blit(noPlayer, (900, 350))
             self.game.screen.blit(back.raw, (back.x, back.y))
             self.game.screen.blit(start.raw, (start.x, start.y))
-            
+
+            # Render Chat elements
+            font = pg.font.Font(None, 28)
+            input_box = pg.Rect(10, 655, 380, 30)
+            color = pg.Color("white")
+            pg.draw.rect(self.game.screen, pg.Color("white"), input_box, 2)
+            # Print text in chat box
+            if (len(message) > 25):
+                message = message[0:28]
+                txt_surface = font.render(message, True, pg.Color("white"))
+                self.game.screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+            else:
+                txt_surface = font.render(message, True, pg.Color("white"))
+                self.game.screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
+
+            # Print text in chat panel
+            start_y = 50
+            panelFont = pg.font.Font(None, 25)
+            for content in self.game.chatTranscript:
+                label = panelFont.render(content, 1, (255,255,255))
+                self.game.screen.blit(label, (20, start_y))
+                start_y += 20
+        
             pg.display.flip()
