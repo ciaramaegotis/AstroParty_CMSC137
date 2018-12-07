@@ -9,17 +9,22 @@ from utils.images import *
 from chat import Chat
 
 class Lobby:
-    def __init__(self, game):
+    def __init__(self, game, lobbyType):
         self.game = game
+        # Create and join lobby 
         self.game.chat = Chat(self.game)
-        self.game.lobby_id = self.game.chat.createLobby(4).lobby_id
-        self.game.chat.connectToLobby(self.game.lobby_id, self.game.username)
-
+        if lobbyType == 'create':
+            self.game.lobby_id = self.game.chat.createLobby(4).lobby_id
+            self.game.chat.connectToLobby(self.game.lobby_id, self.game.username)
+            self.game.createLobby(self.game.lobby_id, self.game.username)
+        elif lobbyType == 'join':
+            self.game.joinLobby(self.game.username)
+        
         back = Button('backButton', 530, 600, 224, 64)
         start = Button('nextButton', 950, 600, 220, 63)
         
         message = ""
-        while self.game.currentDisplay == PLAYER_LOBBY:
+        while self.game.currentDisplay == PLAYER_CREATELOBBY or self.game.currentDisplay == PLAYER_JOINLOBBY:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game.running = False
@@ -38,14 +43,8 @@ class Lobby:
                         try:
                             if(message == "dc()"):
                                 self.game.chat.disconnectChat()
-                                # chat_disconnect.player.name = username
-                                # sock.send(chat_disconnect.SerializeToString())
-                                # isBreak = True
-                                # quit()
                             elif(message == "list()"):
-                                print("list!")
-                                # updatePlayers()
-                                # print(players)
+                                self.game.chat.listPlayers()
                             else:
                                 self.game.chat.sendMessage(message)
 
@@ -67,8 +66,18 @@ class Lobby:
             self.game.screen.blit(noPlayer, (600, 350))
             self.game.screen.blit(noPlayer, (900, 350))
             self.game.screen.blit(back.raw, (back.x, back.y))
-            self.game.screen.blit(start.raw, (start.x, start.y))
+            if lobbyType == 'createLobby':
+                self.game.screen.blit(start.raw, (start.x, start.y))
+            
+            self.game.getPlayers()
+            if self.game.currentPlayers == 2:
+                self.game.screen.blit(player2, (900, 200))    
+            if self.game.currentPlayers == 3:
+                self.game.screen.blit(player3, (600, 350))
+            if self.game.currentPlayers == 4:
+                self.game.screen.blit(player4, (900, 350))
 
+        
             # Render Chat elements
             font = pg.font.Font(None, 28)
             input_box = pg.Rect(10, 655, 380, 30)

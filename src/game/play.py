@@ -13,6 +13,10 @@ from utils.button import Button
 
 from chat import Chat
 
+import sys
+    
+host = sys.argv[1]
+
 class Play:
     def __init__(self):
         # initialize
@@ -32,6 +36,12 @@ class Play:
         host = "" #TO DO: save here the host (only the host can click the start game)
         players = [] #TO DO: once startgame is clicked, get the final list of players
 
+        # Start UDP server thread
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.UDP_thread = Thread(target=self.evaluateData)
+        self.UDP_thread.daemon = True
+        self.UDP_thread.start()
+    
     def update(self):
         # Check which display should be rendered
         self.checkDisplay()
@@ -39,10 +49,39 @@ class Play:
     def checkDisplay(self):
         if self.currentDisplay == MAIN_MENU:
             Menu(self)
-        elif self.currentDisplay == PLAYER_LOBBY:
-            Lobby(self)
-######################## Server Functions ###################################
-    # def sendData
+        elif self.currentDisplay == PLAYER_CREATELOBBY:
+            Lobby(self, 'create')
+        elif self.currentDisplay == PLAYER_JOINLOBBY:
+            Lobby(self, 'join')
+########################################## Server Functions ##############################################
+    # Function that listens to server
+    def evaluateData(self):
+        while self.running:
+            data, address = self.sock.recvfrom(1024)
+            # if data
+            payload = data.decode().split(':')
+            payloadType = payload[0]
+            if payloadType == 'CREATE_LOBBY':
+                print("Created Lobby: " + self.lobby_id)
+            elif payloadType == 'JOIN_LOBBY':
+                self.chat.connectToLobby(payload[1], self.username)
+            elif payloadType == 'GET_PLAYERS':
+                self.currentPlayers = int(payload[1])
+                
+
+    def sendToServer(self, data):
+        self.sock.sendto(str.encode(data), (host, 10000))
+    
+    def createLobby(self, id, username):
+        payload = 'CREATE_LOBBY:' + str(id) + ':' + username
+        self.sendToServer(payload)
+
+    def joinLobby(self, username):
+        payload = 'JOIN_LOBBY:' + username
+        self.sendToServer(payload)
+
+    def getPlayers(self):
+        self.sendToServer('GET_PLAYERS')
 
 game = Play()
 

@@ -38,6 +38,9 @@ class Chat:
 				if(len(self.game.chatTranscript) == 29):
 					self.game.chatTranscript.pop(0)
 				self.game.chatTranscript.append(chat.player.name + ": " + chat.message)
+			elif (packet.type == packet.PLAYER_LIST):
+				players = self.packet.PlayerListPacket()
+				players.ParseFromString(data)
 			elif (packet.type == packet.ERR_LDNE):
 				print("This prints if the Lobby doesn't exist")
 				quit()	
@@ -81,12 +84,8 @@ class Chat:
 		players = self.packet.PlayerListPacket()
 		players.type = self.packet.PLAYER_LIST
 		
-		# Send/Receive Data
+		# Send Data
 		self.sock.send(players.SerializeToString())
-		data = self.sock.recv(1024)
-		players.ParseFromString(data)
-		print(players)
-		return players
 		
 	def sendMessage(self, message):
 		# Instantiate Packet

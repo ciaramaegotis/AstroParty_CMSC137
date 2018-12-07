@@ -16,16 +16,15 @@ class Menu:
 
         while self.game.currentDisplay == MAIN_MENU:
             for event in pg.event.get():
-                # pos = pg.mouse.get_pos()
                 if event.type == pg.QUIT:
                     self.game.running = False
                     quit()
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if create.raw.get_rect(topleft=(create.x,create.y)).collidepoint(event.pos):
-                        self.game.currentDisplay = PLAYER_LOBBY
+                        self.game.currentDisplay = PLAYER_CREATELOBBY
                         break
                     elif join.raw.get_rect(topleft=(join.x,join.y)).collidepoint(event.pos):
-                        self.game.currentDisplay = PLAYER_LOBBY
+                        self.game.currentDisplay = PLAYER_JOINLOBBY
                         break
                     elif exitGame.raw.get_rect(topleft=(exitGame.x,exitGame.y)).collidepoint(event.pos):
                         self.game.running = False
