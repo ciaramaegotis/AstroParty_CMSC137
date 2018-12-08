@@ -13,6 +13,7 @@ class Menu:
         create = Button('createlobButton', 310, 400, 263, 74)
         join = Button('joinlobButton', 685, 400, 263, 74)
         exitGame = Button('exitButton', 500, 510, 263, 74)
+        guideButton = Button('nextButton', 600, 600, 263, 74)
 
         while self.game.currentDisplay == MAIN_MENU:
             for event in pg.event.get():
@@ -26,6 +27,10 @@ class Menu:
                     elif join.raw.get_rect(topleft=(join.x,join.y)).collidepoint(event.pos):
                         self.game.currentDisplay = PLAYER_JOINLOBBY
                         break
+                    elif guideButton.raw.get_rect(topleft=(guideButton.x,guideButton.y)).collidepoint(event.pos):
+                        print("GUIDE")
+                        self.game.currentDisplay = GUIDE
+                        break
                     elif exitGame.raw.get_rect(topleft=(exitGame.x,exitGame.y)).collidepoint(event.pos):
                         self.game.running = False
                         quit()
@@ -35,6 +40,7 @@ class Menu:
             self.game.screen.blit(create.raw, (create.x, create.y))
             self.game.screen.blit(join.raw, (join.x, join.y))
             self.game.screen.blit(exitGame.raw, (exitGame.x, exitGame.y))
+            self.game.screen.blit(guideButton.raw, (guideButton.x, guideButton.y))
             pg.display.flip()
         
         # Get Username

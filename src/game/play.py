@@ -9,6 +9,7 @@ from utils.images import *
 from utils.variables import *
 from displays.menu import Menu
 from displays.lobby import Lobby
+from displays.guide import Guide
 from utils.button import Button 
 
 from chat import Chat
@@ -53,6 +54,8 @@ class Play:
             Lobby(self, 'create')
         elif self.currentDisplay == PLAYER_JOINLOBBY:
             Lobby(self, 'join')
+        elif self.currentDisplay == GUIDE:
+            Guide(self)
 ########################################## Server Functions ##############################################
     # Function that listens to server
     def evaluateData(self):
