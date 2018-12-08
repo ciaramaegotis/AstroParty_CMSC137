@@ -58,7 +58,9 @@ class Lobby:
                         message = message[:-1]
                     else:
                         message += event.unicode
-                
+            self.game.getGame()
+            if self.game.gameStart == 1:
+                self.game.currentDisplay = GAMEPLAY
             # Render background elements
             self.game.screen.blit(menuBackground, (0,0))
             self.game.screen.blit(chatPanel, (-20, 33))

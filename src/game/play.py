@@ -29,6 +29,7 @@ class Play:
         
         # Flag to indicate game is running
         self.running = True
+        self.gameStart = 0
         self.username = ''
         self.currentDisplay = MAIN_MENU
         self.screen = pg.display.set_mode((1280, 720))
@@ -75,17 +76,17 @@ class Play:
                 self.userID = payload[2]
             elif payloadType == 'GET_PLAYERS':
                 self.currentPlayers = int(payload[1])
-            elif payloadType == 'START_GAME':
-                self.game.currentDisplay = GAMEPLAY
             elif payloadType == 'UPDATE_GAME':
             	print("Update Game!")
                 #self.currentPlayers = int(payload[1])
             elif payloadType == 'DISCONNECT':
                 self.chat.disconnectChat()
+            elif payloadType == 'GET_GAME':
+                self.gameStart = int(payload[1])
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
-    
+
     def createLobby(self, id, username):
         payload = 'CREATE_LOBBY:' + str(id) + ':' + username
         self.sendToServer(payload)
@@ -104,6 +105,9 @@ class Play:
     def startGame(self):
     	payload = 'START_GAME'
     	self.sendToServer(payload)
+
+    def getGame(self):
+        self.sendToServer('GET_GAME')
 
     def updateGame(self):
     	payload = 'UPDATE_GAME'

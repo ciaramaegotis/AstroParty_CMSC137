@@ -13,7 +13,8 @@ players = []
 players_coordinates = []
 players_scores = []
 
-startGame = False
+startGame = 0
+
 while True:
     # Receive Data
     data, address = sock.recvfrom(1024)
@@ -47,7 +48,7 @@ while True:
         data = str.encode(data)
     
     elif payloadType == 'START_GAME':
-        startGame = True
+        startGame = 1
 
     elif payloadType == 'UPDATE_GAME':
         print("Update Game!")
@@ -56,6 +57,10 @@ while True:
         players[:] = [d for d in players if d.get("id") != int(payload[1])]
         print(players)
         data = 'DISCONNECT'
+        data = str.encode(data)
+    
+    elif payloadType == 'GET_GAME':
+        data = 'GET_GAME:' + str(startGame)
         data = str.encode(data)
         # thelist[:] = [d for d in thelist if d.get('id') != 2]
     # Send data back
