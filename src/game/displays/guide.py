@@ -30,3 +30,4 @@ class Guide:
                             Done = True
                             break
             counter = counter + 1
+        self.game.currentDisplay = MAIN_MENU

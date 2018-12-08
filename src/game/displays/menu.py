@@ -12,8 +12,8 @@ class Menu:
         self.game = game
         create = Button('createlobButton', 310, 400, 263, 74)
         join = Button('joinlobButton', 685, 400, 263, 74)
-        exitGame = Button('exitButton', 500, 510, 263, 74)
-        guideButton = Button('nextButton', 600, 600, 263, 74)
+        exitGame = Button('exitButton', 310, 510, 263, 74)
+        guideButton = Button('nextButton', 685, 510, 263, 74)
 
         while self.game.currentDisplay == MAIN_MENU:
             for event in pg.event.get():

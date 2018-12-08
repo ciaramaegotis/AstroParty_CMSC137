@@ -73,8 +73,11 @@ class Lobby:
             if self.game.currentPlayers == 2:
                 self.game.screen.blit(player2, (900, 200))    
             if self.game.currentPlayers == 3:
+                self.game.screen.blit(player2, (900, 200))  
                 self.game.screen.blit(player3, (600, 350))
             if self.game.currentPlayers == 4:
+                self.game.screen.blit(player2, (900, 200))  
+                self.game.screen.blit(player3, (600, 350))
                 self.game.screen.blit(player4, (900, 350))
 
         
