@@ -5,6 +5,8 @@ os.chdir("..")
 menuBackground = pg.image.load("./images/bg/background.png")
 
 icon = pg.image.load("./images/misc/icon.png")
+rocket_ship = pg.image.load("./images/misc/rocket_ship.png")
+bullet = pg.image.load("./images/misc/bullet.png")
 
 enterUsername = pg.image.load("./images/misc/enterUsername.png")
 astroParty = pg.image.load("./images/misc/astropartyLogo.png")

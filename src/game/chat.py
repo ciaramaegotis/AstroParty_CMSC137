@@ -26,6 +26,7 @@ class Chat:
 	def evaluateData(self):
 		while self.game.running:
 			# Receive Data
+			data = self.sock.recv(1024)
 			self.packet.ParseFromString(data)
 			if(packet.type == packet.DISCONNECT):
 				self.game.chatTranscript.append(chat.player.name + " disconnected from chat.")
