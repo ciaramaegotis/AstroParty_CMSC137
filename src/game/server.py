@@ -10,6 +10,10 @@ numPlayers = 0
 lobby_id = 0
 payload = []
 players = []
+players_coordinates = []
+players_scores = []
+
+startGame = False
 while True:
     # Receive Data
     data, address = sock.recvfrom(1024)
@@ -42,6 +46,12 @@ while True:
         data = 'GET_PLAYERS:' + str(len(players))
         data = str.encode(data)
     
+    elif payloadType == 'START_GAME':
+        startGame = True
+
+    elif payloadType == 'UPDATE_GAME':
+        print("Update Game!")
+
     elif payloadType == 'DISCONNECT':
         players[:] = [d for d in players if d.get("id") != int(payload[1])]
         print(players)

@@ -75,6 +75,11 @@ class Play:
                 self.userID = payload[2]
             elif payloadType == 'GET_PLAYERS':
                 self.currentPlayers = int(payload[1])
+            elif payloadType == 'START_GAME':
+                self.game.currentDisplay = GAMEPLAY
+            elif payloadType == 'UPDATE_GAME':
+            	print("Update Game!")
+                #self.currentPlayers = int(payload[1])
             elif payloadType == 'DISCONNECT':
                 self.chat.disconnectChat()
 
@@ -95,6 +100,14 @@ class Play:
     def disconnectChat(self, userID):
         payload = 'DISCONNECT:' + str(userID)
         self.sendToServer(payload)
+    
+    def startGame(self):
+    	payload = 'START_GAME'
+    	self.sendToServer(payload)
+
+    def updateGame(self):
+    	payload = 'UPDATE_GAME'
+    	self.sendToServer(payload)
 
 
 game = Play()

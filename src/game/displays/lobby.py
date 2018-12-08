@@ -36,8 +36,10 @@ class Lobby:
                         self.game.chatTranscript = []
                         break
                     elif start.raw.get_rect(topleft=(start.x,start.y)).collidepoint(event.pos):
-                        print("Start Pressed!")
-                        self.game.currentDisplay = GAMEPLAY
+                        self.game.getPlayers()
+                        if self.game.currentPlayers >= 2:
+                            self.game.startGame()
+                            self.game.currentDisplay = GAMEPLAY
                         # break
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
