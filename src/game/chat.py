@@ -26,21 +26,24 @@ class Chat:
 	def evaluateData(self):
 		while self.game.running:
 			# Receive Data
-			data = self.sock.recv(1024)
 			self.packet.ParseFromString(data)
 			if(packet.type == packet.DISCONNECT):
-				self.game.chatTranscript.append(self.game.username + " disconnected from chat.")
-				self.game.running = False
-				self.game.currentDisplay = MAIN_MENU
+				self.game.chatTranscript.append(chat.player.name + " disconnected from chat.")
+				if self.game.username == chat.player.name:
+					self.game.running = False
+					self.game.currentDisplay = MAIN_MENU
+					quit()
 			elif (packet.type == packet.CHAT):
 				chat = self.packet.ChatPacket()
 				chat.ParseFromString(data)	
-				if(len(self.game.chatTranscript) == 29):
+				if(len(self.game.chatTranscript) >= 29):
 					self.game.chatTranscript.pop(0)
 				self.game.chatTranscript.append(chat.player.name + ": " + chat.message)
 			elif (packet.type == packet.PLAYER_LIST):
 				players = self.packet.PlayerListPacket()
 				players.ParseFromString(data)
+				print(players.player_list)
+				
 			elif (packet.type == packet.ERR_LDNE):
 				print("This prints if the Lobby doesn't exist")
 				quit()	

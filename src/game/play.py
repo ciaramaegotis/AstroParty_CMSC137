@@ -66,11 +66,14 @@ class Play:
             payloadType = payload[0]
             if payloadType == 'CREATE_LOBBY':
                 print("Created Lobby: " + self.lobby_id)
+                self.userID = payload[1]
             elif payloadType == 'JOIN_LOBBY':
                 self.chat.connectToLobby(payload[1], self.username)
+                self.userID = payload[2]
             elif payloadType == 'GET_PLAYERS':
                 self.currentPlayers = int(payload[1])
-                
+            elif payloadType == 'DISCONNECT':
+                self.chat.disconnectChat()
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
@@ -82,9 +85,14 @@ class Play:
     def joinLobby(self, username):
         payload = 'JOIN_LOBBY:' + username
         self.sendToServer(payload)
-
+    
     def getPlayers(self):
         self.sendToServer('GET_PLAYERS')
+    
+    def disconnectChat(self, userID):
+        payload = 'DISCONNECT:' + str(userID)
+        self.sendToServer(payload)
+
 
 game = Play()
 

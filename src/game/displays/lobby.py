@@ -28,8 +28,8 @@ class Lobby:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game.running = False
+                    self.game.currentDisplay = MAIN_MENU
                     quit()
-
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if back.raw.get_rect(topleft=(back.x,back.y)).collidepoint(event.pos):
                         self.game.currentDisplay = MAIN_MENU
@@ -42,12 +42,11 @@ class Lobby:
                     if event.key == pg.K_RETURN:
                         try:
                             if(message == "dc()"):
-                                self.game.chat.disconnectChat()
+                                self.game.disconnectChat(self.game.userID)
                             elif(message == "list()"):
                                 self.game.chat.listPlayers()
                             else:
                                 self.game.chat.sendMessage(message)
-
                         except OSError:
                             print("\nError")
                         done = True
@@ -66,11 +65,11 @@ class Lobby:
             self.game.screen.blit(noPlayer, (600, 350))
             self.game.screen.blit(noPlayer, (900, 350))
             self.game.screen.blit(back.raw, (back.x, back.y))
-            if lobbyType == 'createLobby':
+            if lobbyType == 'create':
                 self.game.screen.blit(start.raw, (start.x, start.y))
             
             self.game.getPlayers()
-            if self.game.currentPlayers == 2:
+            if self.game.currentPlayers >= 2:
                 self.game.screen.blit(player2, (900, 200))    
             if self.game.currentPlayers == 3:
                 self.game.screen.blit(player2, (900, 200))  
