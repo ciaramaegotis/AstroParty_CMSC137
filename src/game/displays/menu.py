@@ -20,6 +20,23 @@ class Menu:
                 if event.type == pg.QUIT:
                     self.game.running = False
                     quit()
+                if create.raw.get_rect(topleft=(create.x,create.y)).collidepoint(pg.mouse.get_pos()):
+                    create = Button('createLobby_dark', 310, 400, 263, 74)
+                else:
+                    create = Button('createlobButton', 310, 400, 263, 74)
+                if join.raw.get_rect(topleft=(join.x,join.y)).collidepoint(pg.mouse.get_pos()):
+                    join = Button('joinLobby_dark', 685, 400, 263, 74)
+                else:
+                    join = Button('joinlobButton', 685, 400, 263, 74)
+                if guideButton.raw.get_rect(topleft=(guideButton.x,guideButton.y)).collidepoint(pg.mouse.get_pos()):
+                    guideButton = Button('guide_dark', 685, 510, 263, 74)
+                else:
+                    guideButton = Button('guideButton', 685, 510, 263, 74)
+                if exitGame.raw.get_rect(topleft=(exitGame.x,exitGame.y)).collidepoint(pg.mouse.get_pos()):
+                    exitGame = Button('exit_dark', 310, 510, 263, 74)
+                else:
+                    exitGame = Button('exitButton', 310, 510, 263, 74)
+                
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if create.raw.get_rect(topleft=(create.x,create.y)).collidepoint(event.pos):
                         self.game.currentDisplay = PLAYER_CREATELOBBY

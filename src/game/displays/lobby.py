@@ -25,6 +25,15 @@ class Lobby:
         
         message = ""
         while self.game.currentDisplay == PLAYER_CREATELOBBY or self.game.currentDisplay == PLAYER_JOINLOBBY:
+            if back.raw.get_rect(topleft=(back.x,back.y)).collidepoint(pg.mouse.get_pos()):
+                back = Button('backButton_dark', 530, 600, 224, 64)
+            else:
+                back = Button('backButton', 530, 600, 224, 64)
+
+            if start.raw.get_rect(topleft=(start.x,start.y)).collidepoint(pg.mouse.get_pos()):
+                start = Button('nextButton_dark', 950, 600, 220, 63)
+            else:
+                start = Button('nextButton', 950, 600, 220, 63)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game.running = False
