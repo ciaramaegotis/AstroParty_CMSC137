@@ -3,6 +3,7 @@ from threading import Thread
 import pygame as pg
 import socket
 import time
+import json
 
 # Import Files
 from utils.images import *
@@ -36,8 +37,9 @@ class Play:
         self.clock = pg.time.Clock()
         self.currentPlayers = 0
         self.chatTranscript = []
-        host = "" #TO DO: save here the host (only the host can click the start game)
-        players = [] #TO DO: once startgame is clicked, get the final list of players
+        self.playersList = []
+        # host = "" #TO DO: save here the host (only the host can click the start game)
+        # players = [] #TO DO: once startgame is clicked, get the final list of players
 
         # Start UDP server thread
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -66,14 +68,15 @@ class Play:
         while self.running:
             data, address = self.sock.recvfrom(1024)
             # if data
-            payload = data.decode().split(':')
+            payload = data.decode().split(' ')
             payloadType = payload[0]
+            # print(payload)
             if payloadType == 'CREATE_LOBBY':
                 print("Created Lobby: " + self.lobby_id)
-                self.userID = payload[1]
+                self.userID = int(payload[1])
             elif payloadType == 'JOIN_LOBBY':
                 self.chat.connectToLobby(payload[1], self.username)
-                self.userID = payload[2]
+                self.userID = int(payload[2])
             elif payloadType == 'GET_PLAYERS':
                 self.currentPlayers = int(payload[1])
             elif payloadType == 'UPDATE_GAME':
@@ -83,23 +86,28 @@ class Play:
                 self.chat.disconnectChat()
             elif payloadType == 'GET_GAME':
                 self.gameStart = int(payload[1])
+            elif payloadType == 'UPDATE_PLAYER_LIST':
+                payload = data.decode()
+                payload = payload.strip("UPDATE_PLAYER_LIST ")
+                self.playersList = json.loads(payload)['listP']
+                self.playersList[:] = [d for d in playersList if d.get("id") != self.userID]
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
 
     def createLobby(self, id, username):
-        payload = 'CREATE_LOBBY:' + str(id) + ':' + username
+        payload = 'CREATE_LOBBY ' + str(id) + ' ' + username
         self.sendToServer(payload)
 
     def joinLobby(self, username):
-        payload = 'JOIN_LOBBY:' + username
+        payload = 'JOIN_LOBBY ' + username
         self.sendToServer(payload)
     
     def getPlayers(self):
         self.sendToServer('GET_PLAYERS')
     
     def disconnectChat(self, userID):
-        payload = 'DISCONNECT:' + str(userID)
+        payload = 'DISCONNECT ' + str(userID)
         self.sendToServer(payload)
     
     def startGame(self):
@@ -112,6 +120,15 @@ class Play:
     def updateGame(self):
     	payload = 'UPDATE_GAME'
     	self.sendToServer(payload)
+    
+    def getPlayerStats(self):
+        payload = 'GET_PLAYER_STATS'
+    
+    def sendPlayerStats(self):
+        payload = 'SEND_PLAYER_STATS'
+    
+    def updatePlayerList(self):
+        self.sendToServer('UPDATE_PLAYER_LIST')
 
 
 game = Play()
