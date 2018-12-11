@@ -27,8 +27,10 @@ player3 = pg.image.load("./images/misc/p3.png")
 player4 = pg.image.load("./images/misc/p4.png")
 noPlayer = pg.image.load("./images/misc/noPlayer.png")
 
-
-# enterUsername = pg.transform.scale(enterUsername, (180, 20))
-# start_panel = pg.transform.scale(start_panel, (250, 150))
-# join_panel = pg.transform.scale(join_panel, (250, 150))
-# exit_panel = pg.transform.scale(exit_panel, (250, 150))
+# Guide Images
+rotate = pg.image.load("./images/guide/rotate.png")
+fire = pg.image.load("./images/guide/fire.png")
+rounds = pg.image.load("./images/guide/rounds.png")
+wins = pg.image.load("./images/guide/most_wins.png")
+goodluck = pg.image.load("./images/guide/goodluck.png")
+next = pg.image.load("./images/guide/space.png")

@@ -28,9 +28,8 @@ class Menu:
                         self.game.currentDisplay = PLAYER_JOINLOBBY
                         break
                     elif guideButton.raw.get_rect(topleft=(guideButton.x,guideButton.y)).collidepoint(event.pos):
-                        print("GUIDE")
                         self.game.currentDisplay = GUIDE
-                        break
+                        return(None)
                     elif exitGame.raw.get_rect(topleft=(exitGame.x,exitGame.y)).collidepoint(event.pos):
                         self.game.running = False
                         quit()

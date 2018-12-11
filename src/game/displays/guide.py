@@ -12,14 +12,21 @@ class Guide:
         self.game = game
         # Get Username
         font = pg.font.Font(None, 100)
-        instructions = ['Press R to rotate', 'Press E or Space to fire', 'You have a total of 5 rounds', 'You must have the most number of wins', 'Goodluck!']
+        instructions = [rotate, fire, rounds, wins, goodluck]
         counter = 0
         while (counter < len(instructions)):
-            textsurface = font.render(instructions[counter], False, (255, 140, 0))
-            continueG = font.render("Press space", False, (255, 140, 0))
+            #textsurface = font.render(instructions[counter], False, (255, 140, 0))
+            #continueG = font.render("Press space", False, (255, 140, 0))
             self.game.screen.blit(menuBackground, (0, 0))
-            self.game.screen.blit(textsurface, (0, 0))
-            self.game.screen.blit(continueG, (0, 200))
+            if counter < 2:
+            	self.game.screen.blit(instructions[counter], (300, 150))
+            elif counter == 2:
+            	self.game.screen.blit(instructions[counter], (350, 150))
+            elif counter == 3:
+            	self.game.screen.blit(instructions[counter], (160, 150))
+            else:
+            	self.game.screen.blit(instructions[counter], (280, 120))
+            self.game.screen.blit(next, (280, 600))
             pg.display.flip()
             Done = False
             while not Done:
