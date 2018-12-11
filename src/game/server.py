@@ -29,7 +29,9 @@ while True:
         lobby_id = payload[1]
         newPlayer = {
             "name": payload[2],
-            "id": numPlayers
+            "id": numPlayers,
+            "score": 0,
+            "status": "alive"
         }
         numPlayers += 1
         players['listP'].append(newPlayer)
@@ -39,7 +41,9 @@ while True:
     elif payloadType == 'JOIN_LOBBY':
         newPlayer = {
             "name": payload[1],
-            "id": numPlayers
+            "id": numPlayers,
+            "score": 0,
+            "status": "alive"
         }
         numPlayers += 1
         players['listP'].append(newPlayer)
@@ -95,6 +99,13 @@ while True:
     elif payloadType == 'PURGE_BULLETS':
         bullets = {}
         bullets['listB'] = []
-     
+    
+    elif payloadType == 'KILL_SCORE':
+        # players['listP'][:] = [d for d in players['listP'] if d.get("id") != int(payload[1])]
+        for p in players['listP']:
+            if p["id"] == int(payload[1]):
+                p["status"] = "dead"
+            if p["id"] == int(payload[2]):
+                p["score"] = p["score"] + 1  
     # Send data back
     sock.sendto(data, address)

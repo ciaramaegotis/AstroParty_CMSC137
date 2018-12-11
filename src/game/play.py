@@ -36,6 +36,7 @@ class Play:
         self.screen = pg.display.set_mode((1280, 720))
         self.clock = pg.time.Clock()
         self.currentPlayers = 0
+        self.score = 0
         self.chatTranscript = []
         self.playersList = []
         self.bulletsList = []
@@ -91,14 +92,15 @@ class Play:
                 payload = data.decode()
                 payload = payload.strip("UPDATE_PLAYER_LIST ")
                 self.playersList = json.loads(payload)['listP']
+                for d in self.playersList:
+                    if int(d.get('id')) == self.userID:
+                        self.score = int(d["score"])
                 self.playersList[:] = [d for d in self.playersList if int(d.get('id')) != self.userID]
             elif payloadType == 'UPDATE_BULLET_LIST':
                 payload = data.decode()
                 payload = payload.strip("UPDATE_BULLET_LIST ")
                 self.bulletsList = json.loads(payload)['listB']
                 self.bulletsList[:] = [d for d in self.bulletsList if int(d.get('id')) != self.userID]    
-                print("LIST")
-                print(self.bulletsList)
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
@@ -148,6 +150,10 @@ class Play:
 
     def purgeBullets(self):
         self.sendToServer('PURGE_BULLETS')
+    
+    def killScore(self, killed, killer):
+        payload = 'KILL_SCORE ' + str(killed) + ' ' + str(killer) 
+        self.sendToServer(payload)
 
 game = Play()
 

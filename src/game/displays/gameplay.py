@@ -20,7 +20,7 @@ from .ChatBox import ChatBox
 all_sprite_list = pg.sprite.Group()
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, x, y, playernum):
+    def __init__(self, game, x, y, playernum):
         super().__init__()
         #player
         if(playernum == 0):
@@ -40,21 +40,19 @@ class Player(pg.sprite.Sprite):
         # self.image = pg.transform.scale(self.image, (100, 50))
         self.rect = self.image.get_rect()
         self.rect.y = y
+        self.game = game
         self.rect.x = x
         self.id = 0
         self.walls = None
+        self.collisions = None
         self.rotated = False
 
     def rotate(self):
-        print("ROTATE!")
         self.image = pg.transform.rotate(self.image, 270)
         self.direction = 1 if self.direction == 4 else self.direction+1
     
     def fire(self):
-        print("FIRE!")
-        print(self.rect.x)
-        print(self.rect.y)
-        self.bullet = Bullet(self.rect.x, self.rect.y, self.direction, self.walls)
+        self.bullet = Bullet(self.game, self.rect.x, self.rect.y, self.direction, self.walls, self.collisions)
         all_sprite_list.add(self.bullet)
 
     def changespeed(self, direction):
@@ -121,14 +119,15 @@ class Wall(pg.sprite.Sprite):
 
 class Bullet(pg.sprite.Sprite):
     """ Wall the player can run into. """
-    def __init__(self, x, y, direction, wall_list):
+    def __init__(self, game, x, y, direction, wall_list, collisions):
         """ Constructor for the wall that the player can run into. """
         # Call the parent's constructor
         super().__init__()
- 
         self.image = bullet
+        self.game = game
         self.image = pg.transform.scale(self.image, (10, 10))
         self.walls = wall_list
+        self.collisions = collisions
         self.id = 0
  
         # Make our top-left corner the passed-in location.
@@ -146,6 +145,7 @@ class Bullet(pg.sprite.Sprite):
         elif (direction == 4):#done
             self.rect.y = y - 10
             self.rect.x = x + 20
+        
 
     def update(self):
         """ Update the player position. """
@@ -168,14 +168,24 @@ class Bullet(pg.sprite.Sprite):
         block_hit_list = pg.sprite.spritecollide(self, self.walls, False)
         if (len(block_hit_list) >= 1):
             self.kill()
+        block_hit_list = pg.sprite.spritecollide(self, self.collisions, False)
+        if (len(block_hit_list) >= 1):
+            for col in block_hit_list:
+                self.game.killScore(col.id, self.id)
+            self.kill()
+            self.game.updatePlayerList()
+            print("bullet hit!")
+            print(self.game.playersList)
+            print(self.game.score)
 
 class GamePlay:
     def __init__(self, game):
         self.game = game
+        self.gameFinished = False
         self.remotePlayers = []
-        pg.init()         
+        pg.init()
         wall_list = pg.sprite.Group()
-         
+          
         wall = Wall(0, 0, 10, 600)
         wall_list.add(wall)
         all_sprite_list.add(wall)
@@ -205,13 +215,13 @@ class GamePlay:
             all_sprite_list.add(wall)
         # Create the player paddle object
         if(self.game.userID == 0):
-            self.game.player = Player(50, 50, 0)
+            self.game.player = Player(self.game, 50, 50, 0)
         elif(self.game.userID == 1):
-            self.game.player = Player(550, 50, 1)
+            self.game.player = Player(self.game, 550, 50, 1)
         elif(self.game.userID == 2):
-            self.game.player = Player(50, 350, 2)
+            self.game.player = Player(self.game, 50, 350, 2)
         elif(self.game.userID == 3):
-            self.game.player = Player(550, 350, 3)
+            self.game.player = Player(self.game, 550, 350, 3)
         self.game.player.walls = wall_list
         all_sprite_list.add(self.game.player)
 
@@ -224,13 +234,18 @@ class GamePlay:
         while len(self.game.playersList) <= 0:
             print("nope")
 
+        collide_list = pg.sprite.Group()
         for p in self.game.playersList:
-            newPlayer = Player(p['x'], p['y'], p['id'])
+            newPlayer = Player(self.game, p['x'], p['y'], p['id'])
             newPlayer.walls = wall_list
-            newPlayer.id = p['id']  
+            newPlayer.id = p['id']
+            newPlayer.status = p["status"]
+            wall_list.add()
             self.remotePlayers.append(newPlayer)
+            collide_list.add(self.remotePlayers[len(self.remotePlayers)-1])
             all_sprite_list.add(self.remotePlayers[len(self.remotePlayers)-1])
-         
+        
+        self.game.player.collisions = collide_list
         clock = pg.time.Clock()
          
         active = True
@@ -282,17 +297,27 @@ class GamePlay:
             self.game.updatePlayerList()
             self.game.updateBulletList()
             
+            doneFlag = 1
             for sprite in self.remotePlayers:
                 for p in self.game.playersList:
                     if p['r'] == 'True':
                         sprite.image = pg.transform.rotate(sprite.image, 270)
                         sprite.rotated = False
                     if p['id'] == sprite.id:
+                        if p["status"] == 'alive':
+                            doneFlag = 0    
+                        if p["status"] == 'dead':
+                            all_sprite_list.remove(sprite)
                         sprite.rect.x = p['x']
                         sprite.rect.y = p['y']
-            
+            for p in self.game.playersList:
+                if p['id'] == self.game.userID:
+                    if p["status"] == 'dead':
+                        print("IM DEAD DEDADADAEDAED")
+                        doneFlag = 1
+
             for bullet in self.game.bulletsList:
-                newBullet = Bullet(int(bullet['x']), int(bullet['y']), int(bullet['dir']), self.game.player.walls)
+                newBullet = Bullet(self.game, int(bullet['x']), int(bullet['y']), int(bullet['dir']), self.game.player.walls, self.game.player.collisions)
                 newBullet.id = int(bullet['id'])
                 all_sprite_list.add(newBullet)
                 self.game.bulletsList = []
@@ -320,7 +345,22 @@ class GamePlay:
                 label = panelFont.render(content, 1, (255,255,255))
                 self.game.screen.blit(label, (865, start_y))
                 start_y += 20
+
+            
+            pg.font.init()
+            myfont = pg.font.Font(None, 50)
+            text = self.game.username + '\'s SCORE: ' + str(self.game.score)    
+            txt_surf = myfont.render(text, False, (255,255,255))
+
+            self.game.screen.blit(txt_surf, (50, 600))
+            
             pg.display.flip()
+            if doneFlag == 1:
+                print("GAMEOVER")
+                self.game.currentDisplay == MAIN_MENU
+                break
             clock.tick(60)
-         
-        pg.quit()
+        input_box = pg.Rect(860, 655, 380, 30)
+        pg.draw.rect(self.game.screen, pg.Color("white"), input_box, 2)
+        pg.display.flip()
+        # pg.quit()
