@@ -1,7 +1,7 @@
 import sys
 import pygame as pg
 import random
-
+import time
 WHITE = (255, 255, 255)
 ORANGE = (255, 140, 0)
 
@@ -204,16 +204,19 @@ class GamePlay:
 
         self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID)
             
-        
+        time.sleep(0.5)
         # Get list of other players from server
         self.game.updatePlayerList()
 
+        while len(self.game.playersList) <= 0:
+            print("nope")
+
         for p in self.game.playersList:
-            print("WHAAAt")
             newPlayer = Player(p['x'], p['y'], p['id'])
             newPlayer.walls = wall_list
             newPlayer.id = p['id']
-            all_sprite_list.add(newPlayer)
+            self.remotePlayers.append(newPlayer)
+            all_sprite_list.add(self.remotePlayers[len(self.remotePlayers)-1])
             # if(player['id'] == 2):
             # if(player['id'] == 3):
             
@@ -271,14 +274,12 @@ class GamePlay:
             
             # Get coordinates
             self.game.updatePlayerList()
-            # print("SPRITELIST")
-            # print(all_sprite_list)
-            # for sprite in all_sprite_list:
-            #     if(type(sprite) is Player):
-            #         for p in self.game.playersList:
-            #             if p['id'] == sprite.id:
-            #                 sprite.rect.x = p['x']
-            #                 sprite.rect.y = p['y']
+            
+            for sprite in self.remotePlayers:
+                for p in self.game.playersList:
+                    if p['id'] == sprite.id:
+                        sprite.rect.x = p['x']
+                        sprite.rect.y = p['y']
             # for p in self.game.playersList:
             #     for p2 in self.remotePlayers:
             #         if p['id'] == p2['id']:

@@ -91,6 +91,8 @@ class Play:
                 payload = payload.strip("UPDATE_PLAYER_LIST ")
                 self.playersList = json.loads(payload)['listP']
                 self.playersList[:] = [d for d in self.playersList if d.get("id") != self.userID]
+                print("LIST")
+                print(self.playersList)
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
