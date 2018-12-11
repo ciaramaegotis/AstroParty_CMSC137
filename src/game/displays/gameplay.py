@@ -284,12 +284,12 @@ class GamePlay:
             for sprite in self.remotePlayers:
                 for p in self.game.playersList:
                     if p['r'] == 'True':
-                        sprite.transform.rotate(sprite.image, 270)
+                        sprite.image = pg.transform.rotate(sprite.image, 270)
                     if p['id'] == sprite.id:
                         sprite.rect.x = p['x']
                         sprite.rect.y = p['y']
 
-            self.game.rotated = False
+            self.game.player.rotated = False
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
             all_sprite_list.draw(self.game.screen)
