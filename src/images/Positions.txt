@@ -1,0 +1,13 @@
+Main Menu
+
+Astro Party Log -   (639, 260)
+Create Lobby  -     (463, 509) 
+Exit -              (639, 635) 
+Enter Username -    (642, 281)
+Chat Panel          (243, 359)
+1P                  (703, 193)
+2P                  (1008, 193)
+3P                  (701, 417)
+4P                  (1008, 417)
+BACK                (624, 624)
+NEXT                (1055, 624)
