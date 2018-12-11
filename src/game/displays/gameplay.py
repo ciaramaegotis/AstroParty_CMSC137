@@ -129,6 +129,7 @@ class Bullet(pg.sprite.Sprite):
         self.image = bullet
         self.image = pg.transform.scale(self.image, (10, 10))
         self.walls = wall_list
+        self.id = 0
  
         # Make our top-left corner the passed-in location.
         self.direction = direction
@@ -269,6 +270,7 @@ class GamePlay:
                             self.game.player.rotated = True
                         elif event.key == pg.K_e:
                             self.game.player.fire()
+                            self.game.sendBulletStats(self.game.player.bullet.rect.x, self.game.player.bullet.rect.y, self.game.userID, self.game.player.direction)
 
 
             font = pg.font.Font(None, 28)
@@ -278,6 +280,7 @@ class GamePlay:
             
             # Get coordinates
             self.game.updatePlayerList()
+            self.game.updateBulletList()
             
             for sprite in self.remotePlayers:
                 for p in self.game.playersList:
@@ -287,6 +290,13 @@ class GamePlay:
                     if p['id'] == sprite.id:
                         sprite.rect.x = p['x']
                         sprite.rect.y = p['y']
+            
+            for bullet in self.game.bulletsList:
+                newBullet = Bullet(int(bullet['x']), int(bullet['y']), int(bullet['dir']), self.game.player.walls)
+                newBullet.id = int(bullet['id'])
+                all_sprite_list.add(newBullet)
+                self.game.bulletsList = []
+                self.game.purgeBullets()
 
             self.game.player.rotated = False
             all_sprite_list.update()

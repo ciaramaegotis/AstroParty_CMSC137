@@ -10,6 +10,8 @@ numPlayers = 0
 lobby_id = 0
 payload = []
 players = {}
+bullets = {}
+bullets['listB'] = []
 players['listP'] = []
 players_coordinates = []
 players_scores = []
@@ -68,6 +70,11 @@ while True:
         data = 'UPDATE_PLAYER_LIST '
         data += json.dumps(players)
         data = str.encode(data)
+    
+    elif payloadType == 'UPDATE_BULLET_LIST':
+        data = 'UPDATE_BULLET_LIST '
+        data += json.dumps(bullets)
+        data = str.encode(data)
 
     elif payloadType == 'SEND_PLAYER_STATS':
         for p in players['listP']:
@@ -75,7 +82,19 @@ while True:
                 p['x'] = int(payload[1])
                 p['y'] = int(payload[2])
                 p['r'] = payload[4]
+    
+    elif payloadType == 'SEND_BULLET_STATS':
+        newBullet = {
+            'id': payload[3],
+            'x': payload[1],
+            'y': payload[2],
+            'dir': payload[4]
+        }
+        bullets['listB'].append(newBullet)
+    
+    elif payloadType == 'PURGE_BULLETS':
+        bullets = {}
+        bullets['listB'] = []
      
-
     # Send data back
     sock.sendto(data, address)

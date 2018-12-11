@@ -38,6 +38,7 @@ class Play:
         self.currentPlayers = 0
         self.chatTranscript = []
         self.playersList = []
+        self.bulletsList = []
         # host = "" #TO DO: save here the host (only the host can click the start game)
         # players = [] #TO DO: once startgame is clicked, get the final list of players
 
@@ -90,9 +91,14 @@ class Play:
                 payload = data.decode()
                 payload = payload.strip("UPDATE_PLAYER_LIST ")
                 self.playersList = json.loads(payload)['listP']
-                self.playersList[:] = [d for d in self.playersList if d.get("id") != self.userID]
+                self.playersList[:] = [d for d in self.playersList if int(d.get('id')) != self.userID]
+            elif payloadType == 'UPDATE_BULLET_LIST':
+                payload = data.decode()
+                payload = payload.strip("UPDATE_BULLET_LIST ")
+                self.bulletsList = json.loads(payload)['listB']
+                self.bulletsList[:] = [d for d in self.bulletsList if int(d.get('id')) != self.userID]    
                 print("LIST")
-                print(self.playersList)
+                print(self.bulletsList)
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
@@ -129,10 +135,19 @@ class Play:
     def sendPlayerStats(self, x, y, id, rotated):
         payload = 'SEND_PLAYER_STATS ' + str(x) + ' ' + str(y) + ' ' + str(id) + ' ' + str(rotated)
         self.sendToServer(payload)
+
+    def sendBulletStats(self, x, y, id, dir):
+        payload = 'SEND_BULLET_STATS ' + str(x) + ' ' + str(y) + ' ' + str(id) + ' ' + str(dir)
+        self.sendToServer(payload)
     
     def updatePlayerList(self):
         self.sendToServer('UPDATE_PLAYER_LIST')
 
+    def updateBulletList(self):
+        self.sendToServer('UPDATE_BULLET_LIST')
+
+    def purgeBullets(self):
+        self.sendToServer('PURGE_BULLETS')
 
 game = Play()
 
