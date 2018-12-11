@@ -30,7 +30,13 @@ class Player(pg.sprite.Sprite):
             self.image = ship2
             self.direction = 3
             self.image = pg.transform.rotate(self.image, 540)
-
+        if(playernum == 2):
+            self.image = ship3
+            self.direction = 1
+        if(playernum == 3):
+            self.image = ship4
+            self.direction = 3
+            self.image = pg.transform.rotate(self.image, 540)
         # self.image = pg.transform.scale(self.image, (100, 50))
         self.rect = self.image.get_rect()
         self.rect.y = y
@@ -48,8 +54,8 @@ class Player(pg.sprite.Sprite):
         print("FIRE!")
         print(self.rect.x)
         print(self.rect.y)
-        bullet = Bullet(self.rect.x, self.rect.y, self.direction, self.walls)
-        all_sprite_list.add(bullet)
+        self.bullet = Bullet(self.rect.x, self.rect.y, self.direction, self.walls)
+        all_sprite_list.add(self.bullet)
 
     def changespeed(self, direction):
         """ Change the speed of the player. """
@@ -196,14 +202,15 @@ class GamePlay:
             wall = Wall(200, 300, 400, 10)
             wall_list.add(wall)
             all_sprite_list.add(wall)
-        # elif (maze_number == 2):#slanted cross maze
-        # elif (maze_number == 3):#spiral
-
         # Create the player paddle object
         if(self.game.userID == 0):
             self.game.player = Player(50, 50, 0)
         elif(self.game.userID == 1):
             self.game.player = Player(550, 50, 1)
+        elif(self.game.userID == 2):
+            self.game.player = Player(50, 350, 2)
+        elif(self.game.userID == 3):
+            self.game.player = Player(550, 350, 3)
         self.game.player.walls = wall_list
         all_sprite_list.add(self.game.player)
 
@@ -222,15 +229,6 @@ class GamePlay:
             newPlayer.id = p['id']  
             self.remotePlayers.append(newPlayer)
             all_sprite_list.add(self.remotePlayers[len(self.remotePlayers)-1])
-            # if(player['id'] == 2):
-            # if(player['id'] == 3):
-            
-        # Add all players
-
-        # player2 = Player(150, 150)
-        # player2.walls = wall_list
-        
-        # all_sprite_list.add(player2)
          
         clock = pg.time.Clock()
          
@@ -285,6 +283,7 @@ class GamePlay:
                 for p in self.game.playersList:
                     if p['r'] == 'True':
                         sprite.image = pg.transform.rotate(sprite.image, 270)
+                        sprite.rotated = False
                     if p['id'] == sprite.id:
                         sprite.rect.x = p['x']
                         sprite.rect.y = p['y']
