@@ -32,6 +32,7 @@ class Lobby:
                     quit()
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if back.raw.get_rect(topleft=(back.x,back.y)).collidepoint(event.pos):
+
                         self.game.currentDisplay = MAIN_MENU
                         self.game.chatTranscript = []
                         break
@@ -53,7 +54,7 @@ class Lobby:
                         except OSError:
                             print("\nError")
                         done = True
-                        message = ''
+                        message = '' 
                     elif event.key == pg.K_BACKSPACE:
                         message = message[:-1]
                     else:

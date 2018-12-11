@@ -1,5 +1,5 @@
 import socket
-
+import json
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', 10000))
 
@@ -9,7 +9,8 @@ sock.bind(('0.0.0.0', 10000))
 numPlayers = 0
 lobby_id = 0
 payload = []
-players = []
+players = {}
+players['listP'] = []
 players_coordinates = []
 players_scores = []
 
@@ -19,7 +20,7 @@ while True:
     # Receive Data
     data, address = sock.recvfrom(1024)
 
-    payload = data.decode().split(':')
+    payload = data.decode().split(' ')
     payloadType = payload[0]
     
     if payloadType == 'CREATE_LOBBY':
@@ -29,8 +30,8 @@ while True:
             "id": numPlayers
         }
         numPlayers += 1
-        players.append(newPlayer)
-        data = 'CREATE_LOBBY:' + str(newPlayer["id"])
+        players['listP'].append(newPlayer)
+        data = 'CREATE_LOBBY ' + str(newPlayer["id"])
         data = str.encode(data)
 
     elif payloadType == 'JOIN_LOBBY':
@@ -39,12 +40,12 @@ while True:
             "id": numPlayers
         }
         numPlayers += 1
-        players.append(newPlayer)
-        data = 'JOIN_LOBBY:' + str(lobby_id) + ':' + str(newPlayer["id"]) 
+        players['listP'].append(newPlayer)
+        data = 'JOIN_LOBBY ' + str(lobby_id) + ' ' + str(newPlayer["id"]) 
         data = str.encode(data)
 
     elif payloadType == 'GET_PLAYERS':
-        data = 'GET_PLAYERS:' + str(len(players))
+        data = 'GET_PLAYERS ' + str(len(players['listP']))
         data = str.encode(data)
     
     elif payloadType == 'START_GAME':
@@ -54,14 +55,18 @@ while True:
         print("Update Game!")
 
     elif payloadType == 'DISCONNECT':
-        players[:] = [d for d in players if d.get("id") != int(payload[1])]
-        print(players)
+        players['listP'][:] = [d for d in players['listP'] if d.get("id") != int(payload[1])]
+        print(players['listP'])
         data = 'DISCONNECT'
         data = str.encode(data)
-    
+
     elif payloadType == 'GET_GAME':
-        data = 'GET_GAME:' + str(startGame)
+        data = 'GET_GAME ' + str(startGame)
         data = str.encode(data)
-        # thelist[:] = [d for d in thelist if d.get('id') != 2]
+
+    elif payloadType == 'UPDATE_PLAYER_LIST':
+        data = 'UPDATE_PLAYER_LIST '
+        data += json.dumps(players)
+        data = str.encode(data)
     # Send data back
     sock.sendto(data, address)

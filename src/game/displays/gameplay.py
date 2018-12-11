@@ -14,7 +14,7 @@ from utils.images import *
 all_sprite_list = pg.sprite.Group()
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, playernum):
         super().__init__()
         #player
         self.image = rocket_ship
@@ -22,8 +22,10 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
-
-        self.direction = 1
+        if(playernum == 1):
+            self.direction = 3
+        else:
+            self.direction = 1
         self.walls = None
 
     def rotate(self):
@@ -143,7 +145,6 @@ class Bullet(pg.sprite.Sprite):
 
         if (self.rect.x > 800 or self.rect.x < 0 or self.rect.y > 600 or self.rect.y < 0):
             self.kill()
-        
         self.rect.x += change_x
         self.rect.y += change_y
         block_hit_list = pg.sprite.spritecollide(self, self.walls, False)
@@ -188,17 +189,46 @@ class GamePlay:
         # elif (maze_number == 3):#spiral
 
         # Create the player paddle object
-        player = Player(50, 50)
-        player.walls = wall_list
-         
-        all_sprite_list.add(player)
+        if(self.game.userID == 0):
+            player = Player(50, 50, 0)
+            player.walls = wall_list
+            all_sprite_list.add(player)
+        elif(self.game.userID == 1):
+            player2 = Player2(550, 50, 1)
+            player2.walls = wall_list
+            all_sprite_list.add(player2)
+        
+        
+
+
+        # Get list of players from server
+        self.game.updatePlayerList()
+
+        for p in self.game.playersList:
+            if(p['id'] == 0):
+                player = Player(550, 50, 1)
+                player.walls = wall_list
+                all_sprite_list.add(player)
+            if(p['id'] == 1):
+                player2 = Player(550, 50, 1)
+                player2.walls = wall_list
+                all_sprite_list.add(player2)
+            
+            # if(player['id'] == 2):
+            # if(player['id'] == 3):
+            
+        # Add all players
+
+        # player2 = Player(150, 150)
+        # player2.walls = wall_list
+        
+        # all_sprite_list.add(player2)
          
         clock = pg.time.Clock()
          
         done = False
          
         while not done:
-         
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     done = True
@@ -208,7 +238,15 @@ class GamePlay:
                         player.rotate()
                     elif event.key == pg.K_e:
                         player.fire()
-         
+                        # Send server coords of bullet fired
+
+            # Send coordinates of player to server
+            # self.
+            # Get coordinates of other players from server
+            self.game.getPlayerStats()
+            
+            # Get Bullets
+
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
             all_sprite_list.draw(self.game.screen)
