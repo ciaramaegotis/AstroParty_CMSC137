@@ -90,7 +90,7 @@ class Play:
                 payload = data.decode()
                 payload = payload.strip("UPDATE_PLAYER_LIST ")
                 self.playersList = json.loads(payload)['listP']
-                self.playersList[:] = [d for d in playersList if d.get("id") != self.userID]
+                self.playersList[:] = [d for d in self.playersList if d.get("id") != self.userID]
 
     def sendToServer(self, data):
         self.sock.sendto(str.encode(data), (host, 10000))
@@ -124,8 +124,9 @@ class Play:
     def getPlayerStats(self):
         payload = 'GET_PLAYER_STATS'
     
-    def sendPlayerStats(self):
-        payload = 'SEND_PLAYER_STATS'
+    def sendPlayerStats(self, x, y, id):
+        payload = 'SEND_PLAYER_STATS ' + str(x) + ' ' + str(y) + ' ' + str(id)
+        self.sendToServer(payload)
     
     def updatePlayerList(self):
         self.sendToServer('UPDATE_PLAYER_LIST')

@@ -68,5 +68,13 @@ while True:
         data = 'UPDATE_PLAYER_LIST '
         data += json.dumps(players)
         data = str.encode(data)
+
+    elif payloadType == 'SEND_PLAYER_STATS':
+        for p in players['listP']:
+            if p['id'] == int(payload[3]):
+                p['x'] = int(payload[1])
+                p['y'] = int(payload[2])
+     
+
     # Send data back
     sock.sendto(data, address)

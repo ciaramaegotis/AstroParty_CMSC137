@@ -27,6 +27,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+        self.id = 0
         if(playernum == 1):
             self.direction = 3
         else:
@@ -159,6 +160,7 @@ class Bullet(pg.sprite.Sprite):
 class GamePlay:
     def __init__(self, game):
         self.game = game
+        self.remotePlayers = []
         pg.init()         
         wall_list = pg.sprite.Group()
          
@@ -190,35 +192,28 @@ class GamePlay:
             wall_list.add(wall)
             all_sprite_list.add(wall)
         # elif (maze_number == 2):#slanted cross maze
-
         # elif (maze_number == 3):#spiral
 
         # Create the player paddle object
         if(self.game.userID == 0):
-            player = Player(50, 50, 0)
-            player.walls = wall_list
-            all_sprite_list.add(player)
+            self.game.player = Player(50, 50, 0)
         elif(self.game.userID == 1):
-            player2 = Player(550, 50, 1)
-            player2.walls = wall_list
-            all_sprite_list.add(player2)
-        
-        
+            self.game.player = Player(550, 50, 1)
+        self.game.player.walls = wall_list
+        all_sprite_list.add(self.game.player)
 
-
-        # Get list of players from server
+        self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID)
+            
+        
+        # Get list of other players from server
         self.game.updatePlayerList()
 
         for p in self.game.playersList:
-            if(p['id'] == 0):
-                player = Player(550, 50, 1)
-                player.walls = wall_list
-                all_sprite_list.add(player)
-            if(p['id'] == 1):
-                player2 = Player(550, 50, 1)
-                player2.walls = wall_list
-                all_sprite_list.add(player2)
-            
+            print("WHAAAt")
+            newPlayer = Player(p['x'], p['y'], p['id'])
+            newPlayer.walls = wall_list
+            newPlayer.id = p['id']
+            all_sprite_list.add(newPlayer)
             # if(player['id'] == 2):
             # if(player['id'] == 3):
             
@@ -264,11 +259,42 @@ class GamePlay:
                             message += event.unicode
                     else:
                         if event.key == pg.K_r:
-                            player.rotate()
+                            self.game.player.rotate()
                         elif event.key == pg.K_e:
-                            player.fire()
-            
+                            self.game.player.fire()
+
+
             font = pg.font.Font(None, 28)
+            
+            # Send coords to server
+            self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID)
+            
+            # Get coordinates
+            self.game.updatePlayerList()
+            # print("SPRITELIST")
+            # print(all_sprite_list)
+            # for sprite in all_sprite_list:
+            #     if(type(sprite) is Player):
+            #         for p in self.game.playersList:
+            #             if p['id'] == sprite.id:
+            #                 sprite.rect.x = p['x']
+            #                 sprite.rect.y = p['y']
+            # for p in self.game.playersList:
+            #     for p2 in self.remotePlayers:
+            #         if p['id'] == p2['id']:
+            #             p2['x'] = p['x']
+            #             p2['y'] = p['y']
+            # for p in self.game.playersList:
+            #     if(p['id'] == ):
+            #         player.rect.x == p['x']
+            #         player.rect.y == p['y']                    
+            #         # Change coordinate
+            #     if(p['id'] == 1):
+            #         player2.rect.x == p['x']
+            #         player2.rect.y == p['y']
+                    # Change coordinate
+                # if(player['id'] == 2):
+                # if(player['id'] == 3):
 
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
