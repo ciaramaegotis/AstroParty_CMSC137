@@ -13,7 +13,6 @@ ORANGE = (255, 140, 0)
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y, all_sprite_list):
         super().__init__()
-        #player
         self.image = rocket_ship
         self.image = pg.transform.scale(self.image, (100, 50))
         self.rect = self.image.get_rect()

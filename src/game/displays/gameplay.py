@@ -18,8 +18,6 @@ from .ChatBox import ChatBox
 
 all_sprite_list = pg.sprite.Group()
 
-<<<<<<< HEAD
-=======
 class Player(pg.sprite.Sprite):
     def __init__(self, x, y, playernum):
         super().__init__()
@@ -158,14 +156,9 @@ class Bullet(pg.sprite.Sprite):
         if (len(block_hit_list) >= 1):
             self.kill()
 
->>>>>>> cca0930a388322723e7c1c67de7958679ca80818
 class GamePlay:
     def __init__(self, game):
         self.game = game
-        
-        #instantiate chat
-        #self.game.chat = Chat(self.game)
-        
         pg.init()         
         wall_list = pg.sprite.Group()
          
@@ -196,21 +189,8 @@ class GamePlay:
             wall = Wall(200, 300, 400, 10)
             wall_list.add(wall)
             all_sprite_list.add(wall)
+        # elif (maze_number == 2):#slanted cross maze
 
-<<<<<<< HEAD
-        player = Player(50, 50, all_sprite_list)
-        player.walls = wall_list
-         
-        all_sprite_list.add(player)
-         
-        clock = pg.time.Clock()
-         
-        active = True
-        message = ""
-        chatbox = ChatBox(850, 10, 400, 700)
-        all_sprite_list.add(chatbox)
-        while (True):
-=======
         # elif (maze_number == 3):#spiral
 
         # Create the player paddle object
@@ -219,7 +199,7 @@ class GamePlay:
             player.walls = wall_list
             all_sprite_list.add(player)
         elif(self.game.userID == 1):
-            player2 = Player2(550, 50, 1)
+            player2 = Player(550, 50, 1)
             player2.walls = wall_list
             all_sprite_list.add(player2)
         
@@ -251,10 +231,11 @@ class GamePlay:
          
         clock = pg.time.Clock()
          
-        done = False
-         
-        while not done:
->>>>>>> cca0930a388322723e7c1c67de7958679ca80818
+        active = True
+        message = ""
+        chatbox = ChatBox(850, 10, 400, 700)
+        all_sprite_list.add(chatbox)
+        while (True):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     quit()
@@ -265,7 +246,6 @@ class GamePlay:
                         active = False
                         break
                 elif event.type == pg.KEYDOWN:
-<<<<<<< HEAD
                     if (active):
                         if event.key == pg.K_RETURN:
                             try:
@@ -289,20 +269,6 @@ class GamePlay:
                             player.fire()
             
             font = pg.font.Font(None, 28)
-=======
-                    if event.key == pg.K_r:
-                        player.rotate()
-                    elif event.key == pg.K_e:
-                        player.fire()
-                        # Send server coords of bullet fired
-
-            # Send coordinates of player to server
-            # self.
-            # Get coordinates of other players from server
-            self.game.getPlayerStats()
-            
-            # Get Bullets
->>>>>>> cca0930a388322723e7c1c67de7958679ca80818
 
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
