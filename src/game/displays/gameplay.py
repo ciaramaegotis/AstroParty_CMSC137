@@ -13,12 +13,18 @@ from utils.images import *
 from .wall import Wall
 from .player import Player
 from .bullet import Bullet
+from chat import Chat
+from .ChatBox import ChatBox
 
 all_sprite_list = pg.sprite.Group()
 
 class GamePlay:
     def __init__(self, game):
         self.game = game
+        
+        #instantiate chat
+        #self.game.chat = Chat(self.game)
+        
         pg.init()         
         wall_list = pg.sprite.Group()
          
@@ -57,25 +63,67 @@ class GamePlay:
          
         clock = pg.time.Clock()
          
-        done = False
-         
-        while not done:
-         
+        active = True
+        message = ""
+        chatbox = ChatBox(850, 10, 400, 700)
+        all_sprite_list.add(chatbox)
+        while (True):
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    done = True
-         
+                    quit()
+                if (event.type == pg.MOUSEBUTTONDOWN):
+                    if chatbox.rect.collidepoint(event.pos):
+                        active = True
+                    else:
+                        active = False
+                        break
                 elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_r:
-                        player.rotate()
-                    elif event.key == pg.K_e:
-                        player.fire()
-         
+                    if (active):
+                        if event.key == pg.K_RETURN:
+                            try:
+                                if(message == "dc()"):
+                                    self.game.disconnectChat(self.game.userID)
+                                elif(message == "list()"):
+                                    self.game.chat.listPlayers()
+                                else:
+                                    self.game.chat.sendMessage(message)
+                            except OSError:
+                                print("\nError")
+                            message = ''
+                        elif event.key == pg.K_BACKSPACE:
+                            message = message[:-1]
+                        else:
+                            message += event.unicode
+                    else:
+                        if event.key == pg.K_r:
+                            player.rotate()
+                        elif event.key == pg.K_e:
+                            player.fire()
+            
+            font = pg.font.Font(None, 28)
+
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
             all_sprite_list.draw(self.game.screen)
+            input_box = pg.Rect(860, 655, 380, 30)
+            pg.draw.rect(self.game.screen, pg.Color("white"), input_box, 2)
+            # Print text in chat box
+            if (len(message) > 25):
+                message = message[0:28]
+                txt_surface = font.render(message, True, pg.Color("white"))
+                self.game.screen.blit(txt_surface, (865, 660))
+            else:
+                txt_surface = font.render(message, True, pg.Color("white"))
+                self.game.screen.blit(txt_surface, (865, 660))
+
+            # Print text in chat panel
+            start_y = 50
+            panelFont = pg.font.Font(None, 25)
+            for content in self.game.chatTranscript:
+                label = panelFont.render(content, 1, (255,255,255))
+                self.game.screen.blit(label, (865, start_y))
+                start_y += 20
             pg.display.flip()
             clock.tick(60)
          
         pg.quit()
-
