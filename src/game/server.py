@@ -74,6 +74,7 @@ while True:
             if p['id'] == int(payload[3]):
                 p['x'] = int(payload[1])
                 p['y'] = int(payload[2])
+                p['r'] = payload[4]
      
 
     # Send data back

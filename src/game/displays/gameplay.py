@@ -2,6 +2,7 @@ import sys
 import pygame as pg
 import random
 import time
+
 WHITE = (255, 255, 255)
 ORANGE = (255, 140, 0)
 
@@ -22,17 +23,21 @@ class Player(pg.sprite.Sprite):
     def __init__(self, x, y, playernum):
         super().__init__()
         #player
-        self.image = rocket_ship
-        self.image = pg.transform.scale(self.image, (100, 50))
+        if(playernum == 0):
+            self.image = ship1
+            self.direction = 1
+        if(playernum == 1):
+            self.image = ship2
+            self.direction = 3
+            self.image = pg.transform.rotate(self.image, 540)
+
+        # self.image = pg.transform.scale(self.image, (100, 50))
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
         self.id = 0
-        if(playernum == 1):
-            self.direction = 3
-        else:
-            self.direction = 1
         self.walls = None
+        self.rotated = False
 
     def rotate(self):
         print("ROTATE!")
@@ -202,7 +207,7 @@ class GamePlay:
         self.game.player.walls = wall_list
         all_sprite_list.add(self.game.player)
 
-        self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID)
+        self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID, False)
             
         time.sleep(0.5)
         # Get list of other players from server
@@ -214,7 +219,7 @@ class GamePlay:
         for p in self.game.playersList:
             newPlayer = Player(p['x'], p['y'], p['id'])
             newPlayer.walls = wall_list
-            newPlayer.id = p['id']
+            newPlayer.id = p['id']  
             self.remotePlayers.append(newPlayer)
             all_sprite_list.add(self.remotePlayers[len(self.remotePlayers)-1])
             # if(player['id'] == 2):
@@ -263,6 +268,7 @@ class GamePlay:
                     else:
                         if event.key == pg.K_r:
                             self.game.player.rotate()
+                            self.game.player.rotated = True
                         elif event.key == pg.K_e:
                             self.game.player.fire()
 
@@ -270,33 +276,20 @@ class GamePlay:
             font = pg.font.Font(None, 28)
             
             # Send coords to server
-            self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID)
+            self.game.sendPlayerStats(self.game.player.rect.x, self.game.player.rect.y, self.game.userID, self.game.player.rotated)
             
             # Get coordinates
             self.game.updatePlayerList()
             
             for sprite in self.remotePlayers:
                 for p in self.game.playersList:
+                    if p['r'] == 'True':
+                        sprite.transform.rotate(sprite.image, 270)
                     if p['id'] == sprite.id:
                         sprite.rect.x = p['x']
                         sprite.rect.y = p['y']
-            # for p in self.game.playersList:
-            #     for p2 in self.remotePlayers:
-            #         if p['id'] == p2['id']:
-            #             p2['x'] = p['x']
-            #             p2['y'] = p['y']
-            # for p in self.game.playersList:
-            #     if(p['id'] == ):
-            #         player.rect.x == p['x']
-            #         player.rect.y == p['y']                    
-            #         # Change coordinate
-            #     if(p['id'] == 1):
-            #         player2.rect.x == p['x']
-            #         player2.rect.y == p['y']
-                    # Change coordinate
-                # if(player['id'] == 2):
-                # if(player['id'] == 3):
 
+            self.game.rotated = False
             all_sprite_list.update()
             self.game.screen.blit(menuBackground, (0,0))
             all_sprite_list.draw(self.game.screen)

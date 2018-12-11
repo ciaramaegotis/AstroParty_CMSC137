@@ -5,7 +5,10 @@ os.chdir("..")
 menuBackground = pg.image.load("./images/bg/background.png")
 
 icon = pg.image.load("./images/misc/icon.png")
-rocket_ship = pg.image.load("./images/misc/rocket_ship.png")
+ship1 = pg.image.load("./images/misc/ship1.png")
+ship2 = pg.image.load("./images/misc/ship2.png")
+ship3 = pg.image.load("./images/misc/ship3.png")
+ship4 = pg.image.load("./images/misc/ship4.png")
 bullet = pg.image.load("./images/misc/bullet.png")
 
 enterUsername = pg.image.load("./images/misc/enterUsername.png")

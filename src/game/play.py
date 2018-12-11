@@ -126,8 +126,8 @@ class Play:
     def getPlayerStats(self):
         payload = 'GET_PLAYER_STATS'
     
-    def sendPlayerStats(self, x, y, id):
-        payload = 'SEND_PLAYER_STATS ' + str(x) + ' ' + str(y) + ' ' + str(id)
+    def sendPlayerStats(self, x, y, id, rotated):
+        payload = 'SEND_PLAYER_STATS ' + str(x) + ' ' + str(y) + ' ' + str(id) + ' ' + str(rotated)
         self.sendToServer(payload)
     
     def updatePlayerList(self):
